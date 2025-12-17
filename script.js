@@ -511,9 +511,30 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Daily Progress (For Selected Date)
-            const completedOnSelected = habits.filter(h => h.completedDates && h.completedDates.includes(selectedDateStr)).length;
-            const dayDayPercent = totalHabits > 0 ? Math.round((completedOnSelected / totalHabits) * 100) : 0;
-            updateCircle(dayCircleEl, dayPercentEl, dayDayPercent);
+            // Filter: Only daily habits + one-off tasks FOR THIS DAY count towards total
+            const actionableHabits = habits.filter(h => {
+                const isDaily = !h.type || h.type === 'daily';
+                const isOneOffMatch = h.type === 'one-off' && h.date === selectedDateStr;
+                return isDaily || isOneOffMatch;
+            });
+
+            const totalActionable = actionableHabits.length;
+            const completedOnSelected = actionableHabits.filter(h => h.completedDates && h.completedDates.includes(selectedDateStr)).length;
+            const dayDayPercent = totalActionable > 0 ? Math.round((completedOnSelected / totalActionable) * 100) : 0;
+
+            // Debug: Show count and remaining items
+            const incompleteHabits = actionableHabits.filter(h => !h.completedDates || !h.completedDates.includes(selectedDateStr));
+            const remainingNames = incompleteHabits.map(h => h.name).join(", ");
+
+            // Determine debug label
+            let debugLabel = "";
+            if (remainingNames) {
+                debugLabel = `Missing: ${remainingNames}`;
+            } else if (totalActionable > 0 && dayDayPercent < 100) {
+                debugLabel = `Error: ${completedOnSelected}/${totalActionable}`;
+            }
+
+            updateCircle(dayCircleEl, dayPercentEl, dayDayPercent, debugLabel);
 
             // Update "TODAY" Label
             const todayLabel = document.querySelector('.today-focus h1');
@@ -534,8 +555,9 @@ document.addEventListener('DOMContentLoaded', () => {
             let totalDailyPercents = 0;
             for (let d = 1; d <= currentDay; d++) {
                 const dateStr = getLocalDateString(new Date(year, month, d));
+                // Use totalHabits for history, or maybe simpler logic. Let's stick to simple for month.
                 const completedOnDate = habits.filter(h => h.completedDates && h.completedDates.includes(dateStr)).length;
-                totalDailyPercents += (completedOnDate / totalHabits) * 100;
+                totalDailyPercents += (completedOnDate / (habits.length || 1)) * 100;
             }
             const monthPercent = Math.round(totalDailyPercents / currentDay);
             updateCircle(monthCircleEl, monthPercentEl, monthPercent);
