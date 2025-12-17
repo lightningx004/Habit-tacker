@@ -1,5 +1,6 @@
 /* --- Mobile Responsiveness --- */
 @media (max-width: 900px) {
+
     html,
     body {
         height: auto;
@@ -12,15 +13,18 @@
         min-height: 100vh;
         overflow-y: visible;
         padding: 15px;
-        display: block !important; /* Force block to kill any flex/grid parent constraints */
+        display: block !important;
+        /* Force block to kill any flex/grid parent constraints */
     }
 
     .main-grid {
         display: flex !important;
-        flex-direction: column !important; /* Force vertical stacking */
+        flex-direction: column !important;
+        /* Force vertical stacking */
         height: auto !important;
         overflow: visible;
-        gap: 30px; /* More space between cards */
+        gap: 30px;
+        /* More space between cards */
         padding-bottom: 80px;
     }
 
@@ -41,24 +45,27 @@
     }
 
     .left-panel {
-        order: 2; /* Calendar below today */
+        order: 2;
+        /* Calendar below today */
         gap: 20px;
     }
-    
+
     .center-panel {
-        order: 1; /* Today ring first */
+        order: 1;
+        /* Today ring first */
         margin-bottom: 20px;
     }
 
     .right-panel {
-        order: 3; /* Habits last */
+        order: 3;
+        /* Habits last */
         min-height: 300px;
     }
-    
-    /* Resize the large ring for mobile */
-    .circular-progress, .inner-circle {
-        width: 200px !important;
-        height: 200px !important;
+
+    /* Resize the large ring for mobile - Removed to fix geometry/overlay issues. 250px fits fine. */
+    .circular-progress {
+        margin: 0 auto;
+        /* Center it */
     }
 
     .top-bar {
