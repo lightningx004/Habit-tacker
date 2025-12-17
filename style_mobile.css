@@ -1,0 +1,59 @@
+/* --- Mobile Responsiveness --- */
+@media (max-width: 768px) {
+    .app-container {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+        padding: 10px;
+    }
+
+    .main-grid {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+        overflow: visible;
+        gap: 15px;
+    }
+
+    /* Cards stack vertically, so we let them take natural height */
+    .card,
+    .left-panel,
+    .center-panel,
+    .right-panel {
+        width: 100%;
+        height: auto !important;
+        flex: none;
+        overflow: visible;
+        /* Let content expand the card */
+    }
+
+    /* Restore scroll for habits list within the page scroll */
+    .habits-list {
+        overflow-y: visible;
+        max-height: none;
+    }
+
+    .right-panel {
+        /* On mobile, maybe limit habit list height or just let it run long?
+           User asked "why i can t scroll", implying they want to scroll the page. 
+           Let's let it run long. */
+        min-height: 400px;
+    }
+
+    .top-bar {
+        padding: 10px 15px;
+    }
+
+    h1 {
+        font-size: 1.2em;
+    }
+
+    /* Calendar adjustments */
+    .calendar-day {
+        font-size: 0.8em;
+        padding: 2px 0;
+    }
+}
+/* Drag & Drop Styles */
+.sortable-ghost { opacity: 0.4; background: rgba(0, 255, 157, 0.1); border: 1px dashed var(--accent-neon); }
+.sortable-drag { cursor: grabbing; background: #1a1a1a; box-shadow: 0 0 15px var(--accent-neon); opacity: 1; transform: scale(1.02); }

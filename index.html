@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Habit Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="dropdown.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- PWA Setup -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#00ff9d">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Top Bar: Year Progress -->
+        <header class="top-bar">
+            <div class="sync-status" id="sync-status" title="Connecting...">
+                <span class="status-dot"></span>
+                <span class="status-text">Sync</span>
+            </div>
+            <span>2025 Progress</span>
+            <div class="progress-bar-container year-progress">
+                <div class="progress-fill" id="year-fill"></div>
+            </div>
+            <span id="year-percent">0%</span>
+        </header>
+
+        <main class="main-grid">
+            <!-- Left Panel: Month & Calendar -->
+            <section class="left-panel">
+                <div class="card month-card">
+                    <h2>Month</h2>
+                    <div class="circular-progress small" id="month-circle">
+                        <div class="inner-circle">
+                            <span id="month-percent">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card calendar-card">
+                    <div class="calendar-header">
+                        <button class="icon-btn" id="prev-month">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
+                        <span id="calendar-month-year">December 2025</span>
+                        <button class="icon-btn" id="next-month">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="calendar-grid" id="calendar-grid">
+                        <!-- Calendar days injected by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Center Panel: Today's Ring -->
+            <section class="center-panel">
+                <div class="today-focus">
+                    <h1>TODAY</h1>
+                    <div class="circular-progress large glowing" id="day-circle">
+                        <div class="inner-circle">
+                            <span id="day-percent">0%</span>
+                            <span class="label">Completed</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Panel: Habits List -->
+            <section class="right-panel">
+                <div class="habits-header">
+                    <h2>Your Habits <small style="font-size:0.5em; opacity:0.5;">(v1.2)</small></h2>
+                    <div class="menu-container" style="position: relative;">
+                        <button class="icon-btn" id="menu-btn" aria-label="Habit Options">
+                            <!-- 3 dots icon -->
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="5" r="2" />
+                                <circle cx="12" cy="12" r="2" />
+                                <circle cx="12" cy="19" r="2" />
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu hidden" id="habits-menu">
+                            <button id="menu-add-habit" class="menu-item">
+                                <span>+</span> Daily Habit
+                            </button>
+                            <button id="menu-add-task" class="menu-item">
+                                <span>•</span> specific Task
+                            </button>
+                            <div style="border-top: 1px solid #333; margin: 5px 0;"></div>
+                            <button id="menu-notifications" class="menu-item">
+                                <span>🔔</span> Notifications
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+                <ul class="habits-list" id="habits-list">
+                    <!-- Habits injected by JS -->
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <!-- Simple Add Habit Modal -->
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Add New Habit</h3>
+            <input type="text" id="new-habit-input" placeholder="Enter habit name...">
+            <div class="modal-actions">
+                <button id="cancel-btn">Cancel</button>
+                <button id="save-btn">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <!-- SortableJS (Drag & Drop) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+
+    <!-- Main Script -->
+    <script src="script.js"></script>
+</body>
+
+</html>
