@@ -588,9 +588,24 @@ document.addEventListener('DOMContentLoaded', () => {
             updateBar(yearFillEl, yearPercentEl, yearPercent);
         }
 
-        function updateCircle(circleEl, textEl, percent) {
+        function updateCircle(circleEl, textEl, percent, subLabel = "") {
             if (!circleEl || !textEl) return;
             textEl.textContent = `${percent}%`;
+
+            // Handle Sub-Label (Counter)
+            const parent = textEl.parentElement;
+            if (parent) {
+                const labelEl = parent.querySelector('.label');
+                if (labelEl) {
+                    if (subLabel) {
+                        labelEl.innerHTML = subLabel;
+                    } else {
+                        labelEl.textContent = "COMPLETED"; // Default fallback
+                        labelEl.className = "label"; // Reset classes
+                    }
+                }
+            }
+
             // Update the CSS variable instead of the background string
             // This triggers the smooth transition defined in CSS
             circleEl.style.setProperty('--progress-angle', `${percent * 3.6}deg`);
