@@ -522,19 +522,26 @@ document.addEventListener('DOMContentLoaded', () => {
             const completedOnSelected = actionableHabits.filter(h => h.completedDates && h.completedDates.includes(selectedDateStr)).length;
             const dayDayPercent = totalActionable > 0 ? Math.round((completedOnSelected / totalActionable) * 100) : 0;
 
-            // Debug: Show count and remaining items
-            const incompleteHabits = actionableHabits.filter(h => !h.completedDates || !h.completedDates.includes(selectedDateStr));
-            const remainingNames = incompleteHabits.map(h => h.name).join(", ");
+            // Determine Counter Label
+            let labelHTML = "COMPLETED"; // Default
 
-            // Determine debug label
-            let debugLabel = "";
-            if (remainingNames) {
-                debugLabel = `Missing: ${remainingNames}`;
-            } else if (totalActionable > 0 && dayDayPercent < 100) {
-                debugLabel = `Error: ${completedOnSelected}/${totalActionable}`;
+            if (totalActionable > 0) {
+                // Feature: "6/10" with glow
+                const ratio = completedOnSelected / totalActionable;
+                const text = `${completedOnSelected}/${totalActionable}`;
+
+                if (ratio >= 0.8) {
+                    // Green Glow (>= 80%)
+                    labelHTML = `<span class="text-glow-green">${text}</span>`;
+                } else {
+                    // Red Glow (< 80%)
+                    labelHTML = `<span class="text-glow-red">${text}</span>`;
+                }
             }
 
-            updateCircle(dayCircleEl, dayPercentEl, dayDayPercent, debugLabel);
+            // Using formatting arguments or direct innerHTML injection in updateCircle
+            // We'll pass the raw HTML string as the 'subLabel'
+            updateCircle(dayCircleEl, dayPercentEl, dayDayPercent, labelHTML);
 
             // Update "TODAY" Label
             const todayLabel = document.querySelector('.today-focus h1');

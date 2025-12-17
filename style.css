@@ -645,6 +645,20 @@ body {
     text-shadow: 0 0 10px rgba(0, 255, 156, 0.3);
 }
 
+.text-glow-red {
+    color: #ff4444 !important;
+    text-shadow: 0 0 10px #ff0000;
+    font-weight: bold;
+    font-size: 1.2em !important;
+}
+
+.text-glow-green {
+    color: #00ff9d !important;
+    text-shadow: 0 0 10px #00ff9d;
+    font-weight: bold;
+    font-size: 1.2em !important;
+}
+
 .modal-content input {
     width: 100%;
     padding: 15px;
