@@ -530,256 +530,256 @@ body {
 .habit-item .habit-checkbox,
 .habit-item .drag-handle {
     pointer-events: auto;
+}
 
+.habit-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(5px);
+}
 
-    .habit-item:hover {
-        background: rgba(255, 255, 255, 0.08);
-        transform: translateX(5px);
+.habit-item.completed {
+    border-color: rgba(0, 255, 157, 0.3);
+    background: rgba(0, 255, 157, 0.05);
+}
+
+.habit-item.readonly {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.habit-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Custom Checkbox */
+.habit-checkbox {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--text-secondary);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.habit-checkbox.checked {
+    background: var(--accent-neon);
+    border-color: var(--accent-neon);
+    box-shadow: 0 0 10px var(--accent-neon);
+}
+
+.habit-checkbox.checked::after {
+    content: '✔';
+    font-size: 0.8em;
+    color: #000;
+    font-weight: 900;
+}
+
+.habit-checkbox.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.habit-name {
+    font-size: 1em;
+    font-weight: 500;
+}
+
+.habit-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.streak-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--text-secondary);
+    font-size: 0.9em;
+    background: #151718;
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+.streak-icon {
+    font-size: 1.2em;
+    filter: drop-shadow(0 0 5px orange);
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: #444;
+    cursor: pointer;
+    font-size: 1.2em;
+    transition: color 0.3s;
+}
+
+.delete-btn:hover {
+    color: #ff4444;
+}
+
+/* Modal updates */
+.modal-content {
+    background: rgba(30, 30, 30, 0.6);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(0, 255, 156, 0.2);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 255, 156, 0.05);
+    border-radius: 20px;
+    padding: 30px;
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(0, 255, 156, 0.3);
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid #444;
+    border-radius: 12px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 1.1em;
+    transition: all 0.3s;
+}
+
+.modal-content input:focus {
+    outline: none;
+    border-color: var(--accent-neon);
+    background: rgba(0, 255, 156, 0.05);
+    box-shadow: 0 0 15px rgba(0, 255, 156, 0.1);
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.modal-actions button {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 30px;
+    /* Pill shape */
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1em;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#cancel-btn {
+    background: transparent;
+    color: #aaa;
+    border: 1px solid transparent;
+}
+
+#cancel-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+#save-btn {
+    background: var(--accent-neon);
+    color: #000;
+    box-shadow: 0 0 15px var(--accent-dim);
+}
+
+#save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px var(--accent-neon);
+    filter: brightness(1.1);
+}
+
+/* --- Mobile Responsiveness --- */
+/* Strictly enforce mobile scroll */
+@media (max-width: 900px) {
+
+    html,
+    body {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto !important;
+        /* Force scroll */
     }
 
-    .habit-item.completed {
-        border-color: rgba(0, 255, 157, 0.3);
-        background: rgba(0, 255, 157, 0.05);
-    }
-
-    .habit-item.readonly {
-        opacity: 0.6;
-        pointer-events: none;
-    }
-
-    .habit-left {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-
-    /* Custom Checkbox */
-    .habit-checkbox {
-        width: 24px;
-        height: 24px;
-        border: 2px solid var(--text-secondary);
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.3s;
-        position: relative;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .habit-checkbox.checked {
-        background: var(--accent-neon);
-        border-color: var(--accent-neon);
-        box-shadow: 0 0 10px var(--accent-neon);
-    }
-
-    .habit-checkbox.checked::after {
-        content: '✔';
-        font-size: 0.8em;
-        color: #000;
-        font-weight: 900;
-    }
-
-    .habit-checkbox.disabled {
-        cursor: not-allowed;
-        opacity: 0.5;
-    }
-
-    .habit-name {
-        font-size: 1em;
-        font-weight: 500;
-    }
-
-    .habit-right {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .streak-container {
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        color: var(--text-secondary);
-        font-size: 0.9em;
-        background: #151718;
-        padding: 5px 10px;
-        border-radius: 20px;
-    }
-
-    .streak-icon {
-        font-size: 1.2em;
-        filter: drop-shadow(0 0 5px orange);
-    }
-
-    .delete-btn {
-        background: none;
-        border: none;
-        color: #444;
-        cursor: pointer;
-        font-size: 1.2em;
-        transition: color 0.3s;
-    }
-
-    .delete-btn:hover {
-        color: #ff4444;
-    }
-
-    /* Modal updates */
-    .modal-content {
-        background: rgba(30, 30, 30, 0.6);
-        backdrop-filter: blur(15px);
-        border: 1px solid rgba(0, 255, 156, 0.2);
-        box-shadow: 0 0 40px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(0, 255, 156, 0.05);
-        border-radius: 20px;
-        padding: 30px;
-    }
-
-    .modal-content h3 {
-        margin-top: 0;
-        margin-bottom: 20px;
-        font-size: 1.5em;
-        color: #fff;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        text-shadow: 0 0 10px rgba(0, 255, 156, 0.3);
-    }
-
-    .modal-content input {
-        width: 100%;
+    .app-container {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: visible;
         padding: 15px;
-        background: rgba(0, 0, 0, 0.3);
-        border: 1px solid #444;
-        border-radius: 12px;
-        color: #fff;
-        font-family: inherit;
-        font-size: 1.1em;
-        transition: all 0.3s;
+        display: block;
+        /* Remove flex constraint */
     }
 
-    .modal-content input:focus {
-        outline: none;
-        border-color: var(--accent-neon);
-        background: rgba(0, 255, 156, 0.05);
-        box-shadow: 0 0 15px rgba(0, 255, 156, 0.1);
-    }
-
-    .modal-actions {
+    .main-grid {
         display: flex;
-        justify-content: flex-end;
-        gap: 15px;
-        margin-top: 25px;
+        flex-direction: column;
+        height: auto;
+        overflow: visible;
+        gap: 20px;
+        padding-bottom: 50px;
+        /* Space at bottom for safe scroll */
     }
 
-    .modal-actions button {
-        padding: 12px 25px;
-        border: none;
-        border-radius: 30px;
-        /* Pill shape */
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 1em;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Cards stack vertically */
+    .card,
+    .left-panel,
+    .center-panel,
+    .right-panel,
+    .calendar-card {
+        width: 100%;
+        height: auto !important;
+        flex: none;
+        overflow: visible;
+        margin-bottom: 20px;
     }
 
-    #cancel-btn {
-        background: transparent;
-        color: #aaa;
-        border: 1px solid transparent;
+    .habits-list {
+        overflow-y: visible;
+        max-height: none;
     }
 
-    #cancel-btn:hover {
-        color: #fff;
-        background: rgba(255, 255, 255, 0.05);
+    .calendar-card {
+        min-height: 350px;
     }
 
-    #save-btn {
-        background: var(--accent-neon);
-        color: #000;
-        box-shadow: 0 0 15px var(--accent-dim);
+    h1 {
+        font-size: 1.5em;
     }
 
-    #save-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0 25px var(--accent-neon);
-        filter: brightness(1.1);
+    .month-card {
+        display: none;
+        /* Hide year progress on mobile to save space? Or keep it. keeping for now but small. */
+        margin-bottom: 15px;
     }
+}
 
-    /* --- Mobile Responsiveness --- */
-    /* Strictly enforce mobile scroll */
-    @media (max-width: 900px) {
+/* Drag & Drop Styles */
+.sortable-ghost {
+    opacity: 0.4;
+    background: rgba(0, 255, 157, 0.1);
+    border: 1px dashed var(--accent-neon);
+}
 
-        html,
-        body {
-            height: auto;
-            min-height: 100vh;
-            overflow-y: auto !important;
-            /* Force scroll */
-        }
-
-        .app-container {
-            height: auto;
-            min-height: 100vh;
-            overflow-y: visible;
-            padding: 15px;
-            display: block;
-            /* Remove flex constraint */
-        }
-
-        .main-grid {
-            display: flex;
-            flex-direction: column;
-            height: auto;
-            overflow: visible;
-            gap: 20px;
-            padding-bottom: 50px;
-            /* Space at bottom for safe scroll */
-        }
-
-        /* Cards stack vertically */
-        .card,
-        .left-panel,
-        .center-panel,
-        .right-panel,
-        .calendar-card {
-            width: 100%;
-            height: auto !important;
-            flex: none;
-            overflow: visible;
-            margin-bottom: 20px;
-        }
-
-        .habits-list {
-            overflow-y: visible;
-            max-height: none;
-        }
-
-        .calendar-card {
-            min-height: 350px;
-        }
-
-        h1 {
-            font-size: 1.5em;
-        }
-
-        .month-card {
-            display: none;
-            /* Hide year progress on mobile to save space? Or keep it. keeping for now but small. */
-            margin-bottom: 15px;
-        }
-    }
-
-    /* Drag & Drop Styles */
-    .sortable-ghost {
-        opacity: 0.4;
-        background: rgba(0, 255, 157, 0.1);
-        border: 1px dashed var(--accent-neon);
-    }
-
-    .sortable-drag {
-        cursor: grabbing;
-        background: #1a1a1a;
-        box-shadow: 0 0 5px var(--accent-neon);
-        opacity: 1;
-        transform: scale(1.02);
-    }
+.sortable-drag {
+    cursor: grabbing;
+    background: #1a1a1a;
+    box-shadow: 0 0 5px var(--accent-neon);
+    opacity: 1;
+    transform: scale(1.02);
+}
