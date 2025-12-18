@@ -104,4 +104,29 @@
     box-shadow: 0 0 15px var(--accent-neon);
     opacity: 1;
     transform: scale(1.02);
+
+    /* Fix Menu Overflow & Touch Target */
+    .right-panel {
+        overflow: visible !important;
+        /* Allow menu to pop out */
+    }
+
+    .menu-container {
+        position: relative;
+        z-index: 100 !important;
+    }
+
+    .icon-btn {
+        padding: 15px;
+        /* Larger touch area */
+        z-index: 101 !important;
+    }
+
+    .dropdown-menu {
+        z-index: 102 !important;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        width: 200px;
+    }
 }
