@@ -687,55 +687,56 @@ document.addEventListener('DOMContentLoaded', () => {
                     const completedForDate = actionableHabits.filter(h => h.completedDates && h.completedDates.includes(dateStr)).length;
 
                     if (actionableCount > 0) {
-                        const percent = (completedForDate / actionableCount) * 100;
+                        if (actionableCount > 0) {
+                            const percent = Math.round((completedForDate / actionableCount) * 100);
 
-                        if (percent === 100) {
-                            cell.classList.add('completed');
-                        } else if (percent >= 75) {
-                            // Feature: Glow Green if >= 75% (Past or Present)
-                            cell.classList.add('success-high');
-                        } else if (isPastOrToday && percent < 60) {
-                            cell.classList.add('failure');
+                            if (percent === 100) {
+                                cell.classList.add('completed');
+                            } else if (percent >= 75) {
+                                // Feature: Glow Green if >= 75% (Past or Present)
+                                cell.classList.add('success-high');
+                            } else if (isPastOrToday && percent < 60) {
+                                cell.classList.add('failure');
+                            }
                         }
                     }
+
+                    cell.addEventListener('click', () => {
+                        selectedDate = date;
+                        selectedDateStr = dateStr;
+                        renderAll();
+                    });
+
+                    calendarGridEl.appendChild(cell);
                 }
-
-                cell.addEventListener('click', () => {
-                    selectedDate = date;
-                    selectedDateStr = dateStr;
-                    renderAll();
-                });
-
-                calendarGridEl.appendChild(cell);
             }
+
+            // Navigation Listeners
+            if (prevMonthBtn) {
+                prevMonthBtn.addEventListener('click', () => {
+                    currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+                    renderCalendar();
+                });
+            }
+
+            if (nextMonthBtn) {
+                nextMonthBtn.addEventListener('click', () => {
+                    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+                    renderCalendar();
+                });
+            }
+
+        } catch (globalError) {
+            console.error("Global Script Error:", globalError);
+            alert("An error occurred starting the app: " + globalError.message);
         }
 
-        // Navigation Listeners
-        if (prevMonthBtn) {
-            prevMonthBtn.addEventListener('click', () => {
-                currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
-                renderCalendar();
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker registered', reg))
+                    .catch(err => console.log('Service Worker registration failed', err));
             });
         }
-
-        if (nextMonthBtn) {
-            nextMonthBtn.addEventListener('click', () => {
-                currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
-                renderCalendar();
-            });
-        }
-
-    } catch (globalError) {
-        console.error("Global Script Error:", globalError);
-        alert("An error occurred starting the app: " + globalError.message);
-    }
-
-    // PWA Service Worker Registration
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
-                .then(reg => console.log('Service Worker registered', reg))
-                .catch(err => console.log('Service Worker registration failed', err));
-        });
-    }
-});
+    });
