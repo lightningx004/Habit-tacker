@@ -192,11 +192,11 @@ body {
 }
 
 .calendar-day.today {
-    background: transparent;
+    background: transparent !important;
     color: var(--accent-neon);
     font-weight: bold;
     box-shadow: 0 0 10px rgba(0, 255, 157, 0.4);
-    border: 2px solid var(--accent-neon);
+    border: 2px solid var(--accent-neon) !important;
 }
 
 /* Selected Date Highlight */
