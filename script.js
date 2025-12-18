@@ -687,17 +687,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     const completedForDate = actionableHabits.filter(h => h.completedDates && h.completedDates.includes(dateStr)).length;
 
                     if (actionableCount > 0) {
-                        if (actionableCount > 0) {
-                            const percent = Math.round((completedForDate / actionableCount) * 100);
+                        const percent = Math.round((completedForDate / actionableCount) * 100);
 
-                            if (percent === 100) {
-                                cell.classList.add('completed');
-                            } else if (percent >= 75) {
-                                // Feature: Glow Green if >= 75% (Past or Present)
-                                cell.classList.add('success-high');
-                            } else if (isPastOrToday && percent < 60) {
-                                cell.classList.add('failure');
-                            }
+                        if (percent === 100) {
+                            cell.classList.add('completed');
+                        } else if (percent >= 75) {
+                            // Feature: Glow Green if >= 75% (Past or Present)
+                            cell.classList.add('success-high');
+                        } else if (isPastOrToday && percent < 60) {
+                            cell.classList.add('failure');
                         }
                     }
 
