@@ -691,6 +691,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         if (percent === 100) {
                             cell.classList.add('completed');
+                        } else if (percent >= 75) {
+                            // Feature: Glow Green if >= 75% (Past or Present)
+                            cell.classList.add('success-high');
                         } else if (isPastOrToday && percent < 60) {
                             cell.classList.add('failure');
                         }

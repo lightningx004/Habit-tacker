@@ -797,3 +797,11 @@ body {
     opacity: 1;
     transform: scale(1.02);
 }
+
+.calendar-day.success-high {
+    background: rgba(0, 255, 157, 0.15);
+    color: #00ff9d;
+    box-shadow: 0 0 15px rgba(0, 255, 157, 0.6);
+    font-weight: bold;
+    border: 1px solid rgba(0, 255, 157, 0.6);
+}
