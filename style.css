@@ -192,18 +192,19 @@ body {
 }
 
 .calendar-day.today {
-    background: var(--accent-neon);
-    color: #000;
+    background: transparent;
+    color: var(--accent-neon);
     font-weight: bold;
-    box-shadow: 0 0 15px var(--accent-neon);
-    border: none;
+    box-shadow: 0 0 10px rgba(0, 255, 157, 0.4);
+    border: 2px solid var(--accent-neon);
 }
 
 /* Selected Date Highlight */
 .calendar-day.selected {
-    border: 2px solid var(--text-primary);
+    background: rgba(255, 255, 255, 0.1);
     transform: scale(1.1);
     z-index: 2;
+    border: 1px solid #fff;
 }
 
 /* If today is also selected, keep neon bg but add white border */
@@ -799,9 +800,10 @@ body {
 }
 
 .calendar-day.success-high {
-    background: rgba(0, 255, 157, 0.15);
+    background: rgba(0, 255, 157, 0.3);
+    /* Stronger Fill */
     color: #00ff9d;
-    box-shadow: 0 0 15px rgba(0, 255, 157, 0.6);
+    box-shadow: 0 0 15px rgba(0, 255, 157, 0.5);
     font-weight: bold;
-    border: 1px solid rgba(0, 255, 157, 0.6);
+    border: 1px solid rgba(0, 255, 157, 0.8);
 }
