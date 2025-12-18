@@ -144,6 +144,33 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // Initialize Status Indicator (Local Mode)
+        function updateLocalStatus() {
+            const statusDot = document.querySelector('.status-dot');
+            const statusText = document.querySelector('.status-text');
+            const statusContainer = document.getElementById('sync-status');
+
+            if (statusDot && statusText && statusContainer) {
+                // Check if LocalStorage works
+                try {
+                    localStorage.setItem('test', '1');
+                    localStorage.removeItem('test');
+
+                    // Success: Green
+                    statusDot.style.backgroundColor = 'var(--accent-neon)';
+                    statusDot.style.boxShadow = '0 0 10px var(--accent-neon)';
+                    statusText.textContent = 'Local';
+                    statusContainer.title = "Data saved to your phone (Offline Support Enabled)";
+                } catch (e) {
+                    // Failure: Red
+                    statusDot.style.backgroundColor = '#ff3333';
+                    statusText.textContent = 'Error';
+                    statusContainer.title = "Local Storage is disabled or full.";
+                }
+            }
+        }
+        updateLocalStatus();
+
         // Open "Daily Habit" Mode
         if (menuAddHabitBtn) {
             menuAddHabitBtn.addEventListener('click', () => {
