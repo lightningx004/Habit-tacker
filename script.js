@@ -457,7 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 li.innerHTML = `
                     <div class="habit-left">
-                        <div class="drag-handle" style="cursor:grab; padding: 0 10px 0 0; color:var(--text-secondary); display:flex; align-items:center;">
+                        <div class="drag-handle" style="touch-action: none;">
                              <!-- Six dots icon -->
                             <svg width="12" height="20" viewBox="0 0 12 20" fill="currentColor">
                                 <circle cx="4" cy="4" r="1.5" />
