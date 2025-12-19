@@ -788,5 +788,21 @@ body {
         border-color: rgba(0, 255, 157, 0.6);
         background: rgba(0, 255, 157, 0.15);
         box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
-        color: #fff;
-    }
+
+        /* Drag Handle Tweaks for Mobile */
+        .habit-item .drag-handle {
+            cursor: grab;
+            padding: 15px;
+            /* Increase touch target */
+            margin-right: -5px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            touch-action: none;
+            /* Critical for mobile touch dragging */
+        }
+
+        .habit-item .drag-handle:active {
+            cursor: grabbing;
+            color: var(--accent-neon);
+        }

@@ -80,8 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (habitsListEl) {
             new Sortable(habitsListEl, {
                 animation: 250,
-                delay: 300,
-                delayOnTouchOnly: true,
+                // delay: 0, // Removed delay for instant dragging via handle
                 forceFallback: true, // Use custom drag element instead of native HTML5 drag
                 fallbackOnBody: true, // Append to body to avoid overflow clipping
                 touchStartThreshold: 5, // Ignore small shakes
