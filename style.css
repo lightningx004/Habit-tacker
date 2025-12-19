@@ -530,9 +530,7 @@ body {
 .habit-item .habit-checkbox,
 .habit-item .drag-handle {
     pointer-events: auto;
-
-
-    .habit-item:hover {
+}    .habit-item:hover {
         background: rgba(255, 255, 255, 0.08);
         transform: translateX(5px);
     }
