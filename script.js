@@ -144,33 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Initialize Status Indicator (Local Mode)
-        function updateLocalStatus() {
-            const statusDot = document.querySelector('.status-dot');
-            const statusText = document.querySelector('.status-text');
-            const statusContainer = document.getElementById('sync-status');
-
-            if (statusDot && statusText && statusContainer) {
-                // Check if LocalStorage works
-                try {
-                    localStorage.setItem('test', '1');
-                    localStorage.removeItem('test');
-
-                    // Success: Green
-                    statusDot.style.backgroundColor = 'var(--accent-neon)';
-                    statusDot.style.boxShadow = '0 0 10px var(--accent-neon)';
-                    statusText.textContent = 'Local';
-                    statusContainer.title = "Data saved to your phone (Offline Support Enabled)";
-                } catch (e) {
-                    // Failure: Red
-                    statusDot.style.backgroundColor = '#ff3333';
-                    statusText.textContent = 'Error';
-                    statusContainer.title = "Local Storage is disabled or full.";
-                }
-            }
-        }
-        updateLocalStatus();
-
         // Open "Daily Habit" Mode
         if (menuAddHabitBtn) {
             menuAddHabitBtn.addEventListener('click', () => {
@@ -538,37 +511,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Daily Progress (For Selected Date)
-            // Filter: Only daily habits + one-off tasks FOR THIS DAY count towards total
-            const actionableHabits = habits.filter(h => {
-                const isDaily = !h.type || h.type === 'daily';
-                const isOneOffMatch = h.type === 'one-off' && h.date === selectedDateStr;
-                return isDaily || isOneOffMatch;
-            });
-
-            const totalActionable = actionableHabits.length;
-            const completedOnSelected = actionableHabits.filter(h => h.completedDates && h.completedDates.includes(selectedDateStr)).length;
-            const dayDayPercent = totalActionable > 0 ? Math.round((completedOnSelected / totalActionable) * 100) : 0;
-
-            // Determine Counter Label
-            let labelHTML = "COMPLETED"; // Default
-
-            if (totalActionable > 0) {
-                // Feature: "6/10" with glow
-                const ratio = completedOnSelected / totalActionable;
-                const text = `${completedOnSelected}/${totalActionable}`;
-
-                if (ratio >= 0.8) {
-                    // Green Glow (>= 80%)
-                    labelHTML = `<span class="text-glow-green">${text}</span>`;
-                } else {
-                    // Red Glow (< 80%)
-                    labelHTML = `<span class="text-glow-red">${text}</span>`;
-                }
-            }
-
-            // Using formatting arguments or direct innerHTML injection in updateCircle
-            // We'll pass the raw HTML string as the 'subLabel'
-            updateCircle(dayCircleEl, dayPercentEl, dayDayPercent, labelHTML);
+            const completedOnSelected = habits.filter(h => h.completedDates && h.completedDates.includes(selectedDateStr)).length;
+            const dayDayPercent = totalHabits > 0 ? Math.round((completedOnSelected / totalHabits) * 100) : 0;
+            updateCircle(dayCircleEl, dayPercentEl, dayDayPercent);
 
             // Update "TODAY" Label
             const todayLabel = document.querySelector('.today-focus h1');
@@ -589,9 +534,8 @@ document.addEventListener('DOMContentLoaded', () => {
             let totalDailyPercents = 0;
             for (let d = 1; d <= currentDay; d++) {
                 const dateStr = getLocalDateString(new Date(year, month, d));
-                // Use totalHabits for history, or maybe simpler logic. Let's stick to simple for month.
                 const completedOnDate = habits.filter(h => h.completedDates && h.completedDates.includes(dateStr)).length;
-                totalDailyPercents += (completedOnDate / (habits.length || 1)) * 100;
+                totalDailyPercents += (completedOnDate / totalHabits) * 100;
             }
             const monthPercent = Math.round(totalDailyPercents / currentDay);
             updateCircle(monthCircleEl, monthPercentEl, monthPercent);
@@ -615,24 +559,9 @@ document.addEventListener('DOMContentLoaded', () => {
             updateBar(yearFillEl, yearPercentEl, yearPercent);
         }
 
-        function updateCircle(circleEl, textEl, percent, subLabel = "") {
+        function updateCircle(circleEl, textEl, percent) {
             if (!circleEl || !textEl) return;
             textEl.textContent = `${percent}%`;
-
-            // Handle Sub-Label (Counter)
-            const parent = textEl.parentElement;
-            if (parent) {
-                const labelEl = parent.querySelector('.label');
-                if (labelEl) {
-                    if (subLabel) {
-                        labelEl.innerHTML = subLabel;
-                    } else {
-                        labelEl.textContent = "COMPLETED"; // Default fallback
-                        labelEl.className = "label"; // Reset classes
-                    }
-                }
-            }
-
             // Update the CSS variable instead of the background string
             // This triggers the smooth transition defined in CSS
             circleEl.style.setProperty('--progress-angle', `${percent * 3.6}deg`);
@@ -714,54 +643,52 @@ document.addEventListener('DOMContentLoaded', () => {
                     const completedForDate = actionableHabits.filter(h => h.completedDates && h.completedDates.includes(dateStr)).length;
 
                     if (actionableCount > 0) {
-                        const percent = Math.round((completedForDate / actionableCount) * 100);
+                        const percent = (completedForDate / actionableCount) * 100;
 
                         if (percent === 100) {
                             cell.classList.add('completed');
-                        } else if (percent >= 75) {
-                            // Feature: Glow Green if >= 75% (Past or Present)
-                            cell.classList.add('success-high');
                         } else if (isPastOrToday && percent < 60) {
                             cell.classList.add('failure');
                         }
                     }
-
-                    cell.addEventListener('click', () => {
-                        selectedDate = date;
-                        selectedDateStr = dateStr;
-                        renderAll();
-                    });
-
-                    calendarGridEl.appendChild(cell);
                 }
-            }
 
-            // Navigation Listeners
-            if (prevMonthBtn) {
-                prevMonthBtn.addEventListener('click', () => {
-                    currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
-                    renderCalendar();
+                cell.addEventListener('click', () => {
+                    selectedDate = date;
+                    selectedDateStr = dateStr;
+                    renderAll();
                 });
-            }
 
-            if (nextMonthBtn) {
-                nextMonthBtn.addEventListener('click', () => {
-                    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
-                    renderCalendar();
-                });
+                calendarGridEl.appendChild(cell);
             }
-
-        } catch (globalError) {
-            console.error("Global Script Error:", globalError);
-            alert("An error occurred starting the app: " + globalError.message);
         }
 
-        // PWA Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('Service Worker registered', reg))
-                    .catch(err => console.log('Service Worker registration failed', err));
+        // Navigation Listeners
+        if (prevMonthBtn) {
+            prevMonthBtn.addEventListener('click', () => {
+                currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+                renderCalendar();
             });
         }
-    });
+
+        if (nextMonthBtn) {
+            nextMonthBtn.addEventListener('click', () => {
+                currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+                renderCalendar();
+            });
+        }
+
+    } catch (globalError) {
+        console.error("Global Script Error:", globalError);
+        alert("An error occurred starting the app: " + globalError.message);
+    }
+
+    // PWA Service Worker Registration
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('Service Worker registered', reg))
+                .catch(err => console.log('Service Worker registration failed', err));
+        });
+    }
+});
