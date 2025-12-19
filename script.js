@@ -511,9 +511,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Daily Progress (For Selected Date)
-            const completedOnSelected = habits.filter(h => h.completedDates && h.completedDates.includes(selectedDateStr)).length;
-            const dayDayPercent = totalHabits > 0 ? Math.round((completedOnSelected / totalHabits) * 100) : 0;
-            updateCircle(dayCircleEl, dayPercentEl, dayDayPercent);
+            // Filter: Only daily habits + one-off tasks FOR THIS DAY count towards total
+            const actionableHabits = habits.filter(h => {
+                const isDaily = !h.type || h.type === 'daily';
+                const isOneOffMatch = h.type === 'one-off' && h.date === selectedDateStr;
+                return isDaily || isOneOffMatch;
+            });
+
+            const totalActionable = actionableHabits.length;
+            const completedOnSelected = actionableHabits.filter(h => h.completedDates && h.completedDates.includes(selectedDateStr)).length;
+            const dayDayPercent = totalActionable > 0 ? Math.round((completedOnSelected / totalActionable) * 100) : 0;
+
+            // Counter String (e.g., "6/8")
+            const counterStr = `${completedOnSelected}/${totalActionable}`;
+
+            updateCircle(dayCircleEl, dayPercentEl, dayDayPercent, counterStr);
 
             // Update "TODAY" Label
             const todayLabel = document.querySelector('.today-focus h1');
@@ -559,11 +571,30 @@ document.addEventListener('DOMContentLoaded', () => {
             updateBar(yearFillEl, yearPercentEl, yearPercent);
         }
 
-        function updateCircle(circleEl, textEl, percent) {
+        function updateCircle(circleEl, textEl, percent, subLabel = "") {
             if (!circleEl || !textEl) return;
             textEl.textContent = `${percent}%`;
-            // Update the CSS variable instead of the background string
-            // This triggers the smooth transition defined in CSS
+
+            // Handle Sub-Label (Counter)
+            const parent = textEl.parentElement;
+            if (parent) {
+                const labelEl = parent.querySelector('.label');
+                if (labelEl) {
+                    if (subLabel) {
+                        labelEl.innerHTML = subLabel;
+                        // Dynamic Glow classes
+                        labelEl.className = 'label'; // reset
+                        const ratio = parseInt(subLabel.split('/')[0]) / parseInt(subLabel.split('/')[1]);
+                        if (ratio >= 0.8) labelEl.classList.add('text-glow-green');
+                        else labelEl.classList.add('text-glow-red');
+                    } else {
+                        labelEl.textContent = "COMPLETED"; // Default fallback
+                        labelEl.className = "label";
+                    }
+                }
+            }
+
+            // Update the CSS variable
             circleEl.style.setProperty('--progress-angle', `${percent * 3.6}deg`);
         }
 
