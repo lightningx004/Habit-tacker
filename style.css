@@ -544,7 +544,16 @@ body {
 
 .habit-item.readonly {
     opacity: 0.6;
+    /* pointer-events: none;  <-- REMOVE THIS to allow clicking the handle */
+    /* Instead, disable specific children if needed, but let the LI receive events for Sortable */
+    pointer-events: auto;
+}
+
+.habit-item.readonly .habit-checkbox,
+.habit-item.readonly .delete-btn {
     pointer-events: none;
+    /* Disable editing/deleting, but allow dragging */
+    opacity: 0.5;
 }
 
 .habit-left {
