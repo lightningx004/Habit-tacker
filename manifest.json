@@ -1,7 +1,7 @@
 {
   "name": "Neon Habit Tracker",
   "short_name": "Habits",
-  "start_url": "/",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#000000",
   "theme_color": "#00ff9d",
