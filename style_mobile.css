@@ -1,24 +1,6 @@
 /* --- Mobile Responsiveness --- */
 @media (max-width: 768px) {
     .app-container {
-        .main-grid {
-            display: flex;
-            flex-direction: column;
-            height: auto;
-            overflow: visible;
-            gap: 35px;
-            /* Increased to 35px for more breathing room */
-        }
-
-        .right-panel {
-            width: 100%;
-            height: auto !important;
-            flex: none;
-            overflow: visible;
-            /* Let content expand the card */
-        }
-
-        /* Restore scroll for habits list within the page scroll */
         .habits-list {
             overflow-y: visible;
             max-height: none;
