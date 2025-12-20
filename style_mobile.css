@@ -1,6 +1,15 @@
 /* --- Mobile Responsiveness --- */
 @media (max-width: 768px) {
     .app-container {
+        .main-grid {
+            display: flex;
+            flex-direction: column;
+            height: auto;
+            overflow: visible;
+            gap: 35px;
+            /* Increased to 35px for more breathing room */
+        }
+
         .right-panel {
             width: 100%;
             height: auto !important;
