@@ -791,27 +791,33 @@ body {
     box-shadow: 0 0 5px var(--accent-neon);
     opacity: 1;
     transform: scale(1.02);
+}
 
-    /* High Success Glow (>75%) */
-    .calendar-day.success-high {
-        border-color: rgba(0, 255, 157, 0.6);
-        background: rgba(0, 255, 157, 0.15);
-        box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+/* High Success Glow (>75%) */
+.calendar-day.success-high {
+    border-color: rgba(0, 255, 157, 0.6);
+    background: rgba(0, 255, 157, 0.15);
+    box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+}
 
-        /* Drag Handle Tweaks for Mobile */
-        .habit-item .drag-handle {
-            cursor: grab;
-            padding: 15px;
-            /* Increase touch target */
-            margin-right: -5px;
-            color: var(--text-secondary);
-            display: flex;
-            align-items: center;
-            touch-action: none;
-            /* Critical for mobile touch dragging */
-        }
+/* Drag Handle Tweaks for Mobile */
+.habit-item .drag-handle {
+    cursor: grab;
+    padding: 20px;
+    /* BIG touch target */
+    margin: -15px 0 -15px -15px;
+    /* Negative margin to expand touch area */
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none !important;
+    /* Force browser to ignore scrolling */
+    -webkit-touch-callout: none;
+    user-select: none;
+}
 
-        .habit-item .drag-handle:active {
-            cursor: grabbing;
-            color: var(--accent-neon);
-        }
+/* CRITICAL FIX: Ensure the ICON doesn't block the handle click */
+.habit-item .drag-handle svg {
+    pointer-events: none;
+}
