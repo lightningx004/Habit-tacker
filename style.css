@@ -795,9 +795,13 @@ body {
 
 /* High Success Glow (>75%) */
 .calendar-day.success-high {
-    border-color: rgba(0, 255, 157, 0.6);
-    background: rgba(0, 255, 157, 0.15);
-    box-shadow: 0 0 10px rgba(0, 255, 157, 0.3);
+    border: 1px solid var(--accent-neon) !important;
+    background: rgba(0, 255, 157, 0.25) !important;
+    box-shadow: 0 0 15px var(--accent-neon), inset 0 0 5px var(--accent-neon) !important;
+    color: #fff !important;
+    text-shadow: 0 0 5px var(--accent-neon);
+    z-index: 2;
+    /* Ensure it glows on top */
 }
 
 /* Drag Handle Tweaks for Mobile */
