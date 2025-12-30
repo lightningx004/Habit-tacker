@@ -3,8 +3,8 @@
   "short_name": "Habits",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0f1110",
-  "theme_color": "#0f1110",
+  "background_color": "#000000",
+  "theme_color": "#00ff9d",
   "orientation": "portrait",
   "icons": [
     {

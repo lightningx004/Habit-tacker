@@ -1,44 +1,107 @@
 /* --- Mobile Responsiveness --- */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
+
+    html,
+    body {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto !important;
+    }
+
     .app-container {
-        .habits-list {
-            overflow-y: visible;
-            max-height: none;
-        }
-
-        .right-panel {
-            /* On mobile, maybe limit habit list height or just let it run long?
-           User asked "why i can t scroll", implying they want to scroll the page. 
-           Let's let it run long. */
-            min-height: 400px;
-        }
-
-        .top-bar {
-            padding: 10px 15px;
-        }
-
-        h1 {
-            font-size: 1.2em;
-        }
-
-        /* Calendar adjustments */
-        .calendar-day {
-            font-size: 0.8em;
-            padding: 2px 0;
-        }
+        height: auto;
+        min-height: 100vh;
+        overflow-y: visible;
+        padding: 15px;
+        display: block !important;
+        /* Force block to kill any flex/grid parent constraints */
     }
 
-    /* Drag & Drop Styles */
-    .sortable-ghost {
-        opacity: 0.4;
-        background: rgba(0, 255, 157, 0.1);
-        border: 1px dashed var(--accent-neon);
+    .main-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        /* Force vertical stacking */
+        height: auto !important;
+        overflow: visible;
+        gap: 30px;
+        /* More space between cards */
+        padding-bottom: 80px;
     }
 
-    .sortable-drag {
-        cursor: grabbing;
-        background: #1a1a1a;
-        box-shadow: 0 0 15px var(--accent-neon);
-        opacity: 1;
-        transform: scale(1.02);
+    /* Force all cards to full width and natural height */
+    .card,
+    .left-panel,
+    .center-panel,
+    .right-panel,
+    .calendar-card,
+    .month-card,
+    .today-focus {
+        width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        flex: none !important;
+        margin-bottom: 0;
+        max-width: none !important;
     }
+
+    .left-panel {
+        order: 2;
+        /* Calendar below today */
+        gap: 20px;
+    }
+
+    .center-panel {
+        order: 1;
+        /* Today ring first */
+        margin-bottom: 20px;
+    }
+
+    .right-panel {
+        order: 3;
+        /* Habits last */
+        min-height: 300px;
+    }
+
+    /* Resize the large ring for mobile - Removed to fix geometry/overlay issues. 250px fits fine. */
+    .circular-progress {
+        margin: 0 auto;
+        /* Center it */
+    }
+
+    .top-bar {
+        padding: 15px;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    /* Calendar adjustments */
+    .calendar-day {
+        font-size: 1em;
+        padding: 10px 0;
+        height: 45px;
+    }
+
+    .calendar-card {
+        padding: 20px;
+    }
+}
+
+/* Drag & Drop Styles */
+.sortable-ghost {
+    opacity: 0.4;
+    background: rgba(0, 255, 157, 0.1);
+    border: 1px dashed var(--accent-neon);
+}
+
+.sortable-drag {
+    cursor: grabbing;
+    background: #1a1a1a;
+    box-shadow: 0 0 15px var(--accent-neon);
+    opacity: 1;
+    transform: scale(1.02);
+}

@@ -363,52 +363,48 @@ document.addEventListener('DOMContentLoaded', () => {
             const newHabit = {
                 id: Date.now().toString(), // Convert to string for Firestore ID
                 name: trimmedName,
-                completedDates: [],
-                type: isOneOff ? 'one-off' : 'daily',
-                date: isOneOff ? selectedDateStr : null,
-                order: habits.length // Add at the end
-            };
 
-            // Optimistic Update: Add to local state IMMEDIATELY to block subsequent clicks
-            habits.push(newHabit);
-            renderAll(); // Show it immediately to user
 
-            if (db) {
-                // Cloud Write
-                // We do NOT call saveHabitusAction(newHabit) here because that function MIGHT try to do local saves or other logic.
-                // We want to write directly to DB. 
-                // Note: The onSnapshot listener will fire later. It might overwrite 'habits' with the server version, 
-                // but since IDs match (we generated it), it should be consistent.
-                db.collection('habits').doc(newHabit.id).set(newHabit)
-                    .catch(e => {
-                        console.error("Save failed:", e);
-                        // Rollback on failure
-                        habits = habits.filter(h => h.id !== newHabit.id);
-                        renderAll();
-                        alert("Failed to save habit to cloud.");
-                    });
-            } else {
-                saveHabitsLocal(); // Persist to local storage
-            }
+                // Optimistic Update: Add to local state IMMEDIATELY to block subsequent clicks
+                habits.push(newHabit);
+                renderAll(); // Show it immediately to user
+
+            if(db) {
+                    // Cloud Write
+                    // We do NOT call saveHabitusAction(newHabit) here because that function MIGHT try to do local saves or other logic.
+                    // We want to write directly to DB. 
+                    // Note: The onSnapshot listener will fire later. It might overwrite 'habits' with the server version, 
+                    // but since IDs match (we generated it), it should be consistent.
+                    db.collection('habits').doc(newHabit.id).set(newHabit)
+                        .catch(e => {
+                            console.error("Save failed:", e);
+                            // Rollback on failure
+                            habits = habits.filter(h => h.id !== newHabit.id);
+                            renderAll();
+                            alert("Failed to save habit to cloud.");
+                        });
+                } else {
+                    saveHabitsLocal(); // Persist to local storage
+                }
 
             // Clear input and close modal immediately for better UX
-            if (newHabitInput) newHabitInput.value = '';
-            if (modal) modal.classList.add('hidden');
-        }
-        completedDates: [],
-            type: isOneOff ? 'one-off' : 'daily',
-                date: isOneOff ? selectedDateStr : null,
-                    order: habits.length // Add at the end
-    };
+            if(newHabitInput) newHabitInput.value = '';
+                if(modal) modal.classList.add('hidden');
+            }
+            completedDates: [],
+                type: isOneOff ? 'one-off' : 'daily',
+                    date: isOneOff ? selectedDateStr : null,
+                        order: habits.length // Add at the end
+        };
 
-    if (db) {
-        // For cloud, we just write. The subscription updates existing 'habits' array and re-renders.
-        saveHabitAction(newHabit);
-    } else {
-        habits.push(newHabit);
-        saveHabitAction(newHabit); // Will fallback to local
+        if (db) {
+            // For cloud, we just write. The subscription updates existing 'habits' array and re-renders.
+            saveHabitAction(newHabit);
+        } else {
+            habits.push(newHabit);
+            saveHabitAction(newHabit); // Will fallback to local
+        }
     }
-}
 
         function toggleHabit(id) {
         // Prevent changing past data
@@ -431,7 +427,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-        function renderAll() {
+    function renderAll() {
         try {
             renderHabits();
             renderProgress();
@@ -441,7 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-        function calculateStreak(completedDates) {
+    function calculateStreak(completedDates) {
         if (!completedDates || completedDates.length === 0) return 0;
 
         // Sort dates descending
@@ -474,13 +470,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return currentStreak;
     }
 
-        function deleteHabit(id) {
+    function deleteHabit(id) {
         if (confirm('Delete this habit?')) {
             deleteHabitAction(id);
         }
     }
 
-        function renderHabits() {
+    function renderHabits() {
         if (!habitsListEl) return;
         habitsListEl.innerHTML = '';
 
@@ -550,7 +546,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-        function renderProgress() {
+    function renderProgress() {
         const totalHabits = habits.length;
         if (totalHabits === 0) {
             updateCircle(dayCircleEl, dayPercentEl, 0);
@@ -637,7 +633,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateBar(yearFillEl, yearPercentEl, yearPercent);
     }
 
-        function updateCircle(circleEl, textEl, percent, subLabel = "") {
+    function updateCircle(circleEl, textEl, percent, subLabel = "") {
         if (!circleEl || !textEl) return;
         textEl.textContent = `${percent}%`;
 
@@ -660,13 +656,13 @@ document.addEventListener('DOMContentLoaded', () => {
         circleEl.style.setProperty('--progress-angle', `${percent * 3.6}deg`);
     }
 
-        function updateBar(fillEl, textEl, percent) {
+    function updateBar(fillEl, textEl, percent) {
         if (!fillEl || !textEl) return;
         textEl.textContent = `${percent}%`;
         fillEl.style.width = `${percent}%`;
     }
 
-        function renderCalendar() {
+    function renderCalendar() {
         if (!calendarGridEl || !calendarMonthYearEl) return;
 
         const year = currentCalendarDate.getFullYear();
@@ -756,22 +752,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-        // Navigation Listeners
-        if (prevMonthBtn) {
-    prevMonthBtn.addEventListener('click', () => {
-        currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
-        renderCalendar();
-    });
-}
+    // Navigation Listeners
+    if (prevMonthBtn) {
+        prevMonthBtn.addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+            renderCalendar();
+        });
+    }
 
-if (nextMonthBtn) {
-    nextMonthBtn.addEventListener('click', () => {
-        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
-        renderCalendar();
-    });
-}
+    if (nextMonthBtn) {
+        nextMonthBtn.addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+            renderCalendar();
+        });
+    }
 
-    } catch (globalError) {
+} catch (globalError) {
     console.error("Global Script Error:", globalError);
     alert("An error occurred starting the app: " + globalError.message);
 }
