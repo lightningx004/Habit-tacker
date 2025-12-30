@@ -335,159 +335,128 @@ document.addEventListener('DOMContentLoaded', () => {
             return `${year}-${month}-${day}`;
         }
 
-        // Removed duplicate getLocalDateString function
+        function getLocalDateString(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
 
         function addHabit(name, isOneOff) {
-            const trimmedName = name.trim();
+            const newHabit = {
+                id: Date.now().toString(), // Convert to string for Firestore ID
+                name: name,
+                completedDates: [],
+                type: isOneOff ? 'one-off' : 'daily',
+                date: isOneOff ? selectedDateStr : null,
+                order: habits.length // Add at the end
+            };
 
-            // Duplicate Check
-            const duplicate = habits.find(h => {
-                const sameName = h.name.toLowerCase() === trimmedName.toLowerCase();
+            if (db) {
+                // For cloud, we just write. The subscription updates existing 'habits' array and re-renders.
+                saveHabitAction(newHabit);
+            } else {
+                habits.push(newHabit);
+                saveHabitAction(newHabit); // Will fallback to local
+            }
+        }
 
-                if (!sameName) return false;
-
-                if (isOneOff) {
-                    // Check if existing is one-off for SAME date
-                    return h.type === 'one-off' && h.date === selectedDateStr;
-                } else {
-                    // Check if existing is daily (type is daily or undefined)
-                    return !h.type || h.type === 'daily';
-                }
-            });
-
-            if (duplicate) {
-                alert("This habit already exists!");
+        function toggleHabit(id) {
+            // Prevent changing past data
+            if (selectedDateStr !== todayStr) {
+                alert("You cannot change past data.");
                 return;
             }
 
-            const newHabit = {
-                id: Date.now().toString(), // Convert to string for Firestore ID
-                name: trimmedName,
+            // Important: with Firestore, id might be string. Ensure strict comparison matches.
+            const habit = habits.find(h => h.id.toString() === id.toString());
 
-
-                // Optimistic Update: Add to local state IMMEDIATELY to block subsequent clicks
-                habits.push(newHabit);
-                renderAll(); // Show it immediately to user
-
-            if(db) {
-                    // Cloud Write
-                    // We do NOT call saveHabitusAction(newHabit) here because that function MIGHT try to do local saves or other logic.
-                    // We want to write directly to DB. 
-                    // Note: The onSnapshot listener will fire later. It might overwrite 'habits' with the server version, 
-                    // but since IDs match (we generated it), it should be consistent.
-                    db.collection('habits').doc(newHabit.id).set(newHabit)
-                        .catch(e => {
-                            console.error("Save failed:", e);
-                            // Rollback on failure
-                            habits = habits.filter(h => h.id !== newHabit.id);
-                            renderAll();
-                            alert("Failed to save habit to cloud.");
-                        });
+            if (habit) {
+                const index = habit.completedDates.indexOf(todayStr);
+                if (index > -1) {
+                    habit.completedDates.splice(index, 1);
                 } else {
-                    saveHabitsLocal(); // Persist to local storage
+                    habit.completedDates.push(todayStr);
                 }
+                saveHabitAction(habit);
+            }
+        }
 
-            // Clear input and close modal immediately for better UX
-            if(newHabitInput) newHabitInput.value = '';
+        function renderAll() {
+            try {
+                renderHabits();
+                renderProgress();
+                renderCalendar();
+            } catch (e) {
+                console.error("Render Error:", e);
+            }
+        }
 
+        function calculateStreak(completedDates) {
+            if (!completedDates || completedDates.length === 0) return 0;
+
+            // Sort dates descending
+            const sorted = [...completedDates].sort((a, b) => new Date(b) - new Date(a));
+            const today = getLocalDateString(new Date());
+            const yesterday = getLocalDateString(new Date(Date.now() - 86400000));
+
+            // If not completed today, check if completed yesterday to keep streak alive
+            let currentStreak = 0;
+            let checkDate = new Date();
+
+            // Streak logic primarily for Daily habits. 
+            // For one-off, streak might not make sense, but code will just return 1 if done.
+
+            // If we haven't done it today, we start checking from yesterday
+            if (!completedDates.includes(today)) {
+                checkDate.setDate(checkDate.getDate() - 1);
             }
 
-            function toggleHabit(id) {
-                // Prevent changing past data
-                if (selectedDateStr !== todayStr) {
-                    alert("You cannot change past data.");
-                    return;
-                }
-
-                // Important: with Firestore, id might be string. Ensure strict comparison matches.
-                const habit = habits.find(h => h.id.toString() === id.toString());
-
-                if (habit) {
-                    const index = habit.completedDates.indexOf(todayStr);
-                    if (index > -1) {
-                        habit.completedDates.splice(index, 1);
-                    } else {
-                        habit.completedDates.push(todayStr);
-                    }
-                    saveHabitAction(habit);
-                }
-            }
-
-            function renderAll() {
-                try {
-                    renderHabits();
-                    renderProgress();
-                    renderCalendar();
-                } catch (e) {
-                    console.error("Render Error:", e);
-                }
-            }
-
-            function calculateStreak(completedDates) {
-                if (!completedDates || completedDates.length === 0) return 0;
-
-                // Sort dates descending
-                const sorted = [...completedDates].sort((a, b) => new Date(b) - new Date(a));
-                const today = getLocalDateString(new Date());
-                const yesterday = getLocalDateString(new Date(Date.now() - 86400000));
-
-                // If not completed today, check if completed yesterday to keep streak alive
-                let currentStreak = 0;
-                let checkDate = new Date();
-
-                // Streak logic primarily for Daily habits. 
-                // For one-off, streak might not make sense, but code will just return 1 if done.
-
-                // If we haven't done it today, we start checking from yesterday
-                if (!completedDates.includes(today)) {
+            while (true) {
+                const checkStr = getLocalDateString(checkDate);
+                if (completedDates.includes(checkStr)) {
+                    currentStreak++;
                     checkDate.setDate(checkDate.getDate() - 1);
-                }
-
-                while (true) {
-                    const checkStr = getLocalDateString(checkDate);
-                    if (completedDates.includes(checkStr)) {
-                        currentStreak++;
-                        checkDate.setDate(checkDate.getDate() - 1);
-                    } else {
-                        break;
-                    }
-                }
-
-                return currentStreak;
-            }
-
-            function deleteHabit(id) {
-                if (confirm('Delete this habit?')) {
-                    deleteHabitAction(id);
+                } else {
+                    break;
                 }
             }
 
-            function renderHabits() {
-                if (!habitsListEl) return;
-                habitsListEl.innerHTML = '';
+            return currentStreak;
+        }
 
-                const isToday = selectedDateStr === todayStr;
+        function deleteHabit(id) {
+            if (confirm('Delete this habit?')) {
+                deleteHabitAction(id);
+            }
+        }
 
-                habits.forEach(habit => {
-                    // Filter: Show if Daily OR if One-Off matches selected date
-                    const isDaily = !habit.type || habit.type === 'daily';
-                    const isOneOffMatch = habit.type === 'one-off' && habit.date === selectedDateStr;
+        function renderHabits() {
+            if (!habitsListEl) return;
+            habitsListEl.innerHTML = '';
 
-                    if (!isDaily && !isOneOffMatch) {
-                        return; // Skip this habit for this view
-                    }
+            const isToday = selectedDateStr === todayStr;
 
-                    const isCompleted = habit.completedDates && habit.completedDates.includes(selectedDateStr);
-                    // Hide streak for one-off tasks? Maybe. User didn't specify. Let's keep it to verify completion.
-                    const streak = calculateStreak(habit.completedDates);
+            habits.forEach(habit => {
+                // Filter: Show if Daily OR if One-Off matches selected date
+                const isDaily = !habit.type || habit.type === 'daily';
+                const isOneOffMatch = habit.type === 'one-off' && habit.date === selectedDateStr;
 
-                    const li = document.createElement('li');
-                    li.className = `habit-item ${isCompleted ? 'completed' : ''} ${!isToday ? 'readonly' : ''}`;
+                if (!isDaily && !isOneOffMatch) {
+                    return; // Skip this habit for this view
+                }
 
-                    // Add visual tag for one-off?
-                    const oneOffTag = habit.type === 'one-off' ? '<span class="tag-oneoff" style="font-size:0.7em; color:var(--accent-neon); margin-left:10px; border:1px solid var(--accent-neon); padding:2px 6px; border-radius:4px;">TASK</span>' : '';
+                const isCompleted = habit.completedDates && habit.completedDates.includes(selectedDateStr);
+                // Hide streak for one-off tasks? Maybe. User didn't specify. Let's keep it to verify completion.
+                const streak = calculateStreak(habit.completedDates);
 
-                    li.innerHTML = `
+                const li = document.createElement('li');
+                li.className = `habit-item ${isCompleted ? 'completed' : ''} ${!isToday ? 'readonly' : ''}`;
+
+                // Add visual tag for one-off?
+                const oneOffTag = habit.type === 'one-off' ? '<span class="tag-oneoff" style="font-size:0.7em; color:var(--accent-neon); margin-left:10px; border:1px solid var(--accent-neon); padding:2px 6px; border-radius:4px;">TASK</span>' : '';
+
+                li.innerHTML = `
                     <div class="habit-left">
                         <div class="drag-handle" style="cursor:grab; padding: 0 10px 0 0; color:var(--text-secondary); display:flex; align-items:center;">
                              <!-- Six dots icon -->
@@ -512,258 +481,258 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 `;
 
-                    const checkbox = li.querySelector('.habit-checkbox');
-                    if (checkbox) {
-                        checkbox.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            toggleHabit(habit.id);
-                        });
-                    }
-
-                    const delBtn = li.querySelector('.delete-btn');
-                    if (delBtn) {
-                        delBtn.addEventListener('click', (e) => {
-                            e.stopPropagation();
-                            deleteHabit(habit.id);
-                        });
-                    }
-
-                    habitsListEl.appendChild(li);
-                });
-            }
-
-            function renderProgress() {
-                const totalHabits = habits.length;
-                if (totalHabits === 0) {
-                    updateCircle(dayCircleEl, dayPercentEl, 0);
-                    updateCircle(monthCircleEl, monthPercentEl, 0);
-                    updateBar(yearFillEl, yearPercentEl, 0);
-                    return;
-                }
-
-                // Daily Progress (For Selected Date)
-                // Filter: Only daily habits + one-off tasks FOR THIS DAY count towards total
-                const actionableHabits = habits.filter(h => {
-                    const isDaily = !h.type || h.type === 'daily';
-                    const isOneOffMatch = h.type === 'one-off' && h.date === selectedDateStr;
-                    return isDaily || isOneOffMatch;
-                });
-
-                const totalActionable = actionableHabits.length;
-                const completedOnSelected = actionableHabits.filter(h => h.completedDates && h.completedDates.includes(selectedDateStr)).length;
-                const dayDayPercent = totalActionable > 0 ? Math.round((completedOnSelected / totalActionable) * 100) : 0;
-
-                // Determine Counter Label
-                let labelHTML = "COMPLETED"; // Default
-
-                if (totalActionable > 0) {
-                    // Feature: "6/10" with glow
-                    const ratio = completedOnSelected / totalActionable;
-                    const text = `${completedOnSelected}/${totalActionable}`;
-
-                    if (ratio >= 0.8) {
-                        // Green Glow (>= 80%)
-                        labelHTML = `<span class="text-glow-green">${text}</span>`;
-                    } else {
-                        // Red Glow (< 80%)
-                        labelHTML = `<span class="text-glow-red">${text}</span>`;
-                    }
-                }
-
-                // Using formatting arguments or direct innerHTML injection in updateCircle
-                // We'll pass the raw HTML string as the 'subLabel'
-                updateCircle(dayCircleEl, dayPercentEl, dayDayPercent, labelHTML);
-
-                // Update "TODAY" Label
-                const todayLabel = document.querySelector('.today-focus h1');
-                if (todayLabel) {
-                    if (selectedDateStr === todayStr) {
-                        todayLabel.textContent = 'TODAY';
-                    } else {
-                        const options = { month: 'short', day: 'numeric' };
-                        todayLabel.textContent = selectedDate.toLocaleDateString('en-US', options).toUpperCase();
-                    }
-                }
-
-                // Monthly
-                const year = today.getFullYear();
-                const month = today.getMonth();
-                const currentDay = today.getDate();
-
-                let totalDailyPercents = 0;
-                for (let d = 1; d <= currentDay; d++) {
-                    const dateStr = getLocalDateString(new Date(year, month, d));
-                    // Use totalHabits for history, or maybe simpler logic. Let's stick to simple for month.
-                    const completedOnDate = habits.filter(h => h.completedDates && h.completedDates.includes(dateStr)).length;
-                    totalDailyPercents += (completedOnDate / (habits.length || 1)) * 100;
-                }
-                const monthPercent = Math.round(totalDailyPercents / currentDay);
-                updateCircle(monthCircleEl, monthPercentEl, monthPercent);
-
-                // Yearly (Simulated for performance demo)
-                // Only calc for passed days in year to be accurate
-                const startOfYear = new Date(year, 0, 1);
-                const diffStats = Math.floor((today - startOfYear) / (1000 * 60 * 60 * 24)) + 1;
-
-                let totalYearPercents = 0;
-                // Limit loop to avoid hanging if system time is crazy, though 366 is fine.
-                const safeDiff = Math.min(diffStats, 366);
-
-                for (let d = 0; d < safeDiff; d++) {
-                    const dDate = new Date(year, 0, 1 + d);
-                    const dateStr = getLocalDateString(dDate);
-                    const completedOnDate = habits.filter(h => h.completedDates && h.completedDates.includes(dateStr)).length;
-                    totalYearPercents += (completedOnDate / totalHabits) * 100;
-                }
-                const yearPercent = Math.round(totalYearPercents / safeDiff);
-                updateBar(yearFillEl, yearPercentEl, yearPercent);
-            }
-
-            function updateCircle(circleEl, textEl, percent, subLabel = "") {
-                if (!circleEl || !textEl) return;
-                textEl.textContent = `${percent}%`;
-
-                // Handle Sub-Label (Counter)
-                const parent = textEl.parentElement;
-                if (parent) {
-                    const labelEl = parent.querySelector('.label');
-                    if (labelEl) {
-                        if (subLabel) {
-                            labelEl.innerHTML = subLabel;
-                        } else {
-                            labelEl.textContent = "COMPLETED"; // Default fallback
-                            labelEl.className = "label"; // Reset classes
-                        }
-                    }
-                }
-
-                // Update the CSS variable instead of the background string
-                // This triggers the smooth transition defined in CSS
-                circleEl.style.setProperty('--progress-angle', `${percent * 3.6}deg`);
-            }
-
-            function updateBar(fillEl, textEl, percent) {
-                if (!fillEl || !textEl) return;
-                textEl.textContent = `${percent}%`;
-                fillEl.style.width = `${percent}%`;
-            }
-
-            function renderCalendar() {
-                if (!calendarGridEl || !calendarMonthYearEl) return;
-
-                const year = currentCalendarDate.getFullYear();
-                const month = currentCalendarDate.getMonth();
-
-                calendarMonthYearEl.textContent = currentCalendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-
-                const firstDay = new Date(year, month, 1).getDay();
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-                calendarGridEl.innerHTML = '';
-
-                // Weekday headers
-                const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-                weekdays.forEach(day => {
-                    const dayEl = document.createElement('div');
-                    dayEl.style.color = '#555';
-                    dayEl.style.fontSize = '0.8em';
-                    dayEl.textContent = day;
-                    calendarGridEl.appendChild(dayEl);
-                });
-
-                // Empty cells
-                for (let i = 0; i < firstDay; i++) {
-                    calendarGridEl.appendChild(document.createElement('div'));
-                }
-
-                // Days
-                for (let i = 1; i <= daysInMonth; i++) {
-                    const date = new Date(year, month, i);
-                    const dateStr = getLocalDateString(date);
-                    const cell = document.createElement('div');
-                    cell.className = 'calendar-day';
-                    cell.textContent = i;
-
-                    if (dateStr === todayStr) {
-                        cell.classList.add('today');
-                    }
-
-                    if (dateStr === selectedDateStr) {
-                        cell.classList.add('selected');
-                    }
-
-                    // Compare timestamps for passed/today check
-                    const isPastOrToday = date <= new Date();
-
-                    // Mark passed days
-                    if (date < new Date(todayStr)) {
-                        cell.classList.add('passed');
-                    }
-
-                    // Check Progress for Red Glow (< 60%)
-                    if (habits.length > 0) {
-                        // Filter logic must match renderHabits: 
-                        // Daily always counts. One-off counts ONLY if it was for THIS date.
-                        // Actually, simpler: check if habit is 'daily' OR ('one-off' AND date==dateStr)
-                        // But 'habits' list contains all.
-                        // For a specific calendar day, we should check completion of habits relevant to that day.
-
-                        // Count actionable habits for this date
-                        const actionableHabits = habits.filter(h => {
-                            if (h.type === 'one-off') return h.date === dateStr;
-                            return true; // daily
-                        });
-
-                        const actionableCount = actionableHabits.length;
-                        const completedForDate = actionableHabits.filter(h => h.completedDates && h.completedDates.includes(dateStr)).length;
-
-                        if (actionableCount > 0) {
-                            const percent = (completedForDate / actionableCount) * 100;
-
-                            if (percent === 100) {
-                                cell.classList.add('completed');
-                            } else if (isPastOrToday && percent < 60) {
-                                cell.classList.add('failure');
-                            }
-                        }
-                    }
-
-                    cell.addEventListener('click', () => {
-                        selectedDate = date;
-                        selectedDateStr = dateStr;
-                        renderAll();
+                const checkbox = li.querySelector('.habit-checkbox');
+                if (checkbox) {
+                    checkbox.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        toggleHabit(habit.id);
                     });
-
-                    calendarGridEl.appendChild(cell);
                 }
-            }
 
-            // Navigation Listeners
-            if (prevMonthBtn) {
-                prevMonthBtn.addEventListener('click', () => {
-                    currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
-                    renderCalendar();
-                });
-            }
+                const delBtn = li.querySelector('.delete-btn');
+                if (delBtn) {
+                    delBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deleteHabit(habit.id);
+                    });
+                }
 
-            if (nextMonthBtn) {
-                nextMonthBtn.addEventListener('click', () => {
-                    currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
-                    renderCalendar();
-                });
-            }
-
-        } catch (globalError) {
-            console.error("Global Script Error:", globalError);
-            alert("An error occurred starting the app: " + globalError.message);
-        }
-
-        // PWA Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('Service Worker registered', reg))
-                    .catch(err => console.log('Service Worker registration failed', err));
+                habitsListEl.appendChild(li);
             });
         }
-    });
+
+        function renderProgress() {
+            const totalHabits = habits.length;
+            if (totalHabits === 0) {
+                updateCircle(dayCircleEl, dayPercentEl, 0);
+                updateCircle(monthCircleEl, monthPercentEl, 0);
+                updateBar(yearFillEl, yearPercentEl, 0);
+                return;
+            }
+
+            // Daily Progress (For Selected Date)
+            // Filter: Only daily habits + one-off tasks FOR THIS DAY count towards total
+            const actionableHabits = habits.filter(h => {
+                const isDaily = !h.type || h.type === 'daily';
+                const isOneOffMatch = h.type === 'one-off' && h.date === selectedDateStr;
+                return isDaily || isOneOffMatch;
+            });
+
+            const totalActionable = actionableHabits.length;
+            const completedOnSelected = actionableHabits.filter(h => h.completedDates && h.completedDates.includes(selectedDateStr)).length;
+            const dayDayPercent = totalActionable > 0 ? Math.round((completedOnSelected / totalActionable) * 100) : 0;
+
+            // Determine Counter Label
+            let labelHTML = "COMPLETED"; // Default
+
+            if (totalActionable > 0) {
+                // Feature: "6/10" with glow
+                const ratio = completedOnSelected / totalActionable;
+                const text = `${completedOnSelected}/${totalActionable}`;
+
+                if (ratio >= 0.8) {
+                    // Green Glow (>= 80%)
+                    labelHTML = `<span class="text-glow-green">${text}</span>`;
+                } else {
+                    // Red Glow (< 80%)
+                    labelHTML = `<span class="text-glow-red">${text}</span>`;
+                }
+            }
+
+            // Using formatting arguments or direct innerHTML injection in updateCircle
+            // We'll pass the raw HTML string as the 'subLabel'
+            updateCircle(dayCircleEl, dayPercentEl, dayDayPercent, labelHTML);
+
+            // Update "TODAY" Label
+            const todayLabel = document.querySelector('.today-focus h1');
+            if (todayLabel) {
+                if (selectedDateStr === todayStr) {
+                    todayLabel.textContent = 'TODAY';
+                } else {
+                    const options = { month: 'short', day: 'numeric' };
+                    todayLabel.textContent = selectedDate.toLocaleDateString('en-US', options).toUpperCase();
+                }
+            }
+
+            // Monthly
+            const year = today.getFullYear();
+            const month = today.getMonth();
+            const currentDay = today.getDate();
+
+            let totalDailyPercents = 0;
+            for (let d = 1; d <= currentDay; d++) {
+                const dateStr = getLocalDateString(new Date(year, month, d));
+                // Use totalHabits for history, or maybe simpler logic. Let's stick to simple for month.
+                const completedOnDate = habits.filter(h => h.completedDates && h.completedDates.includes(dateStr)).length;
+                totalDailyPercents += (completedOnDate / (habits.length || 1)) * 100;
+            }
+            const monthPercent = Math.round(totalDailyPercents / currentDay);
+            updateCircle(monthCircleEl, monthPercentEl, monthPercent);
+
+            // Yearly (Simulated for performance demo)
+            // Only calc for passed days in year to be accurate
+            const startOfYear = new Date(year, 0, 1);
+            const diffStats = Math.floor((today - startOfYear) / (1000 * 60 * 60 * 24)) + 1;
+
+            let totalYearPercents = 0;
+            // Limit loop to avoid hanging if system time is crazy, though 366 is fine.
+            const safeDiff = Math.min(diffStats, 366);
+
+            for (let d = 0; d < safeDiff; d++) {
+                const dDate = new Date(year, 0, 1 + d);
+                const dateStr = getLocalDateString(dDate);
+                const completedOnDate = habits.filter(h => h.completedDates && h.completedDates.includes(dateStr)).length;
+                totalYearPercents += (completedOnDate / totalHabits) * 100;
+            }
+            const yearPercent = Math.round(totalYearPercents / safeDiff);
+            updateBar(yearFillEl, yearPercentEl, yearPercent);
+        }
+
+        function updateCircle(circleEl, textEl, percent, subLabel = "") {
+            if (!circleEl || !textEl) return;
+            textEl.textContent = `${percent}%`;
+
+            // Handle Sub-Label (Counter)
+            const parent = textEl.parentElement;
+            if (parent) {
+                const labelEl = parent.querySelector('.label');
+                if (labelEl) {
+                    if (subLabel) {
+                        labelEl.innerHTML = subLabel;
+                    } else {
+                        labelEl.textContent = "COMPLETED"; // Default fallback
+                        labelEl.className = "label"; // Reset classes
+                    }
+                }
+            }
+
+            // Update the CSS variable instead of the background string
+            // This triggers the smooth transition defined in CSS
+            circleEl.style.setProperty('--progress-angle', `${percent * 3.6}deg`);
+        }
+
+        function updateBar(fillEl, textEl, percent) {
+            if (!fillEl || !textEl) return;
+            textEl.textContent = `${percent}%`;
+            fillEl.style.width = `${percent}%`;
+        }
+
+        function renderCalendar() {
+            if (!calendarGridEl || !calendarMonthYearEl) return;
+
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+
+            calendarMonthYearEl.textContent = currentCalendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            calendarGridEl.innerHTML = '';
+
+            // Weekday headers
+            const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+            weekdays.forEach(day => {
+                const dayEl = document.createElement('div');
+                dayEl.style.color = '#555';
+                dayEl.style.fontSize = '0.8em';
+                dayEl.textContent = day;
+                calendarGridEl.appendChild(dayEl);
+            });
+
+            // Empty cells
+            for (let i = 0; i < firstDay; i++) {
+                calendarGridEl.appendChild(document.createElement('div'));
+            }
+
+            // Days
+            for (let i = 1; i <= daysInMonth; i++) {
+                const date = new Date(year, month, i);
+                const dateStr = getLocalDateString(date);
+                const cell = document.createElement('div');
+                cell.className = 'calendar-day';
+                cell.textContent = i;
+
+                if (dateStr === todayStr) {
+                    cell.classList.add('today');
+                }
+
+                if (dateStr === selectedDateStr) {
+                    cell.classList.add('selected');
+                }
+
+                // Compare timestamps for passed/today check
+                const isPastOrToday = date <= new Date();
+
+                // Mark passed days
+                if (date < new Date(todayStr)) {
+                    cell.classList.add('passed');
+                }
+
+                // Check Progress for Red Glow (< 60%)
+                if (habits.length > 0) {
+                    // Filter logic must match renderHabits: 
+                    // Daily always counts. One-off counts ONLY if it was for THIS date.
+                    // Actually, simpler: check if habit is 'daily' OR ('one-off' AND date==dateStr)
+                    // But 'habits' list contains all.
+                    // For a specific calendar day, we should check completion of habits relevant to that day.
+
+                    // Count actionable habits for this date
+                    const actionableHabits = habits.filter(h => {
+                        if (h.type === 'one-off') return h.date === dateStr;
+                        return true; // daily
+                    });
+
+                    const actionableCount = actionableHabits.length;
+                    const completedForDate = actionableHabits.filter(h => h.completedDates && h.completedDates.includes(dateStr)).length;
+
+                    if (actionableCount > 0) {
+                        const percent = (completedForDate / actionableCount) * 100;
+
+                        if (percent === 100) {
+                            cell.classList.add('completed');
+                        } else if (isPastOrToday && percent < 60) {
+                            cell.classList.add('failure');
+                        }
+                    }
+                }
+
+                cell.addEventListener('click', () => {
+                    selectedDate = date;
+                    selectedDateStr = dateStr;
+                    renderAll();
+                });
+
+                calendarGridEl.appendChild(cell);
+            }
+        }
+
+        // Navigation Listeners
+        if (prevMonthBtn) {
+            prevMonthBtn.addEventListener('click', () => {
+                currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+                renderCalendar();
+            });
+        }
+
+        if (nextMonthBtn) {
+            nextMonthBtn.addEventListener('click', () => {
+                currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+                renderCalendar();
+            });
+        }
+
+    } catch (globalError) {
+        console.error("Global Script Error:", globalError);
+        alert("An error occurred starting the app: " + globalError.message);
+    }
+
+    // PWA Service Worker Registration
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('Service Worker registered', reg))
+                .catch(err => console.log('Service Worker registration failed', err));
+        });
+    }
+});
