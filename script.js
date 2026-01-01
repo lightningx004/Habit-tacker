@@ -588,160 +588,159 @@ document.addEventListener('DOMContentLoaded', () => {
 
             updateBar(yearFillEl, yearPercentEl, yearPercent);
         }
-    }
 
         function updateCircle(circleEl, textEl, percent, subLabel = "") {
-        if (!circleEl || !textEl) return;
-        textEl.textContent = `${percent}%`;
+            if (!circleEl || !textEl) return;
+            textEl.textContent = `${percent}%`;
 
-        // Handle Sub-Label (Counter)
-        const parent = textEl.parentElement;
-        if (parent) {
-            const labelEl = parent.querySelector('.label');
-            if (labelEl) {
-                if (subLabel) {
-                    labelEl.innerHTML = subLabel;
-                    // Dynamic Glow classes
-                    labelEl.className = 'label'; // reset
-                    const ratio = parseInt(subLabel.split('/')[0]) / parseInt(subLabel.split('/')[1]);
-                    if (ratio >= 0.8) labelEl.classList.add('text-glow-green');
-                    else labelEl.classList.add('text-glow-red');
-                } else {
-                    labelEl.textContent = "COMPLETED"; // Default fallback
-                    labelEl.className = "label";
-                }
-            }
-        }
-
-        // Update the CSS variable
-        circleEl.style.setProperty('--progress-angle', `${percent * 3.6}deg`);
-    }
-
-    function updateBar(fillEl, textEl, percent) {
-        if (!fillEl || !textEl) return;
-        textEl.textContent = `${percent}%`;
-        fillEl.style.width = `${percent}%`;
-    }
-
-    function renderCalendar() {
-        if (!calendarGridEl || !calendarMonthYearEl) return;
-
-        const year = currentCalendarDate.getFullYear();
-        const month = currentCalendarDate.getMonth();
-
-        calendarMonthYearEl.textContent = currentCalendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-        calendarGridEl.innerHTML = '';
-
-        // Weekday headers
-        const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-        weekdays.forEach(day => {
-            const dayEl = document.createElement('div');
-            dayEl.style.color = '#555';
-            dayEl.style.fontSize = '0.8em';
-            dayEl.textContent = day;
-            calendarGridEl.appendChild(dayEl);
-        });
-
-        // Empty cells
-        for (let i = 0; i < firstDay; i++) {
-            calendarGridEl.appendChild(document.createElement('div'));
-        }
-
-        // Days
-        for (let i = 1; i <= daysInMonth; i++) {
-            const date = new Date(year, month, i);
-            const dateStr = getLocalDateString(date);
-            const cell = document.createElement('div');
-            cell.className = 'calendar-day';
-            cell.textContent = i;
-
-            if (dateStr === todayStr) {
-                cell.classList.add('today');
-            }
-
-            if (dateStr === selectedDateStr) {
-                cell.classList.add('selected');
-            }
-
-            // Compare timestamps for passed/today check
-            const isPastOrToday = date <= new Date();
-
-            // Mark passed days
-            if (date < new Date(todayStr)) {
-                cell.classList.add('passed');
-            }
-
-            // Check Progress for Red Glow (< 60%)
-            if (habits.length > 0) {
-                // Filter logic must match renderHabits: 
-                // Daily always counts. One-off counts ONLY if it was for THIS date.
-                // Actually, simpler: check if habit is 'daily' OR ('one-off' AND date==dateStr)
-                // But 'habits' list contains all.
-                // For a specific calendar day, we should check completion of habits relevant to that day.
-
-                // Count actionable habits for this date
-                const actionableHabits = habits.filter(h => {
-                    if (h.type === 'one-off') return h.date === dateStr;
-                    return true; // daily
-                });
-
-                const actionableCount = actionableHabits.length;
-                const completedForDate = actionableHabits.filter(h => h.completedDates && h.completedDates.includes(dateStr)).length;
-
-                if (actionableCount > 0) {
-                    const percent = (completedForDate / actionableCount) * 100;
-
-                    if (percent === 100) {
-                        cell.classList.add('completed');
-                    } else if (percent >= 75) {
-                        // Feature: Glow Green if >= 75% (Past or Present)
-                        cell.classList.add('success-high');
-                    } else if (isPastOrToday && percent < 60) {
-                        cell.classList.add('failure');
+            // Handle Sub-Label (Counter)
+            const parent = textEl.parentElement;
+            if (parent) {
+                const labelEl = parent.querySelector('.label');
+                if (labelEl) {
+                    if (subLabel) {
+                        labelEl.innerHTML = subLabel;
+                        // Dynamic Glow classes
+                        labelEl.className = 'label'; // reset
+                        const ratio = parseInt(subLabel.split('/')[0]) / parseInt(subLabel.split('/')[1]);
+                        if (ratio >= 0.8) labelEl.classList.add('text-glow-green');
+                        else labelEl.classList.add('text-glow-red');
+                    } else {
+                        labelEl.textContent = "COMPLETED"; // Default fallback
+                        labelEl.className = "label";
                     }
                 }
             }
 
-            cell.addEventListener('click', () => {
-                selectedDate = date;
-                selectedDateStr = dateStr;
-                renderAll();
+            // Update the CSS variable
+            circleEl.style.setProperty('--progress-angle', `${percent * 3.6}deg`);
+        }
+
+        function updateBar(fillEl, textEl, percent) {
+            if (!fillEl || !textEl) return;
+            textEl.textContent = `${percent}%`;
+            fillEl.style.width = `${percent}%`;
+        }
+
+        function renderCalendar() {
+            if (!calendarGridEl || !calendarMonthYearEl) return;
+
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+
+            calendarMonthYearEl.textContent = currentCalendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            calendarGridEl.innerHTML = '';
+
+            // Weekday headers
+            const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+            weekdays.forEach(day => {
+                const dayEl = document.createElement('div');
+                dayEl.style.color = '#555';
+                dayEl.style.fontSize = '0.8em';
+                dayEl.textContent = day;
+                calendarGridEl.appendChild(dayEl);
             });
 
-            calendarGridEl.appendChild(cell);
+            // Empty cells
+            for (let i = 0; i < firstDay; i++) {
+                calendarGridEl.appendChild(document.createElement('div'));
+            }
+
+            // Days
+            for (let i = 1; i <= daysInMonth; i++) {
+                const date = new Date(year, month, i);
+                const dateStr = getLocalDateString(date);
+                const cell = document.createElement('div');
+                cell.className = 'calendar-day';
+                cell.textContent = i;
+
+                if (dateStr === todayStr) {
+                    cell.classList.add('today');
+                }
+
+                if (dateStr === selectedDateStr) {
+                    cell.classList.add('selected');
+                }
+
+                // Compare timestamps for passed/today check
+                const isPastOrToday = date <= new Date();
+
+                // Mark passed days
+                if (date < new Date(todayStr)) {
+                    cell.classList.add('passed');
+                }
+
+                // Check Progress for Red Glow (< 60%)
+                if (habits.length > 0) {
+                    // Filter logic must match renderHabits: 
+                    // Daily always counts. One-off counts ONLY if it was for THIS date.
+                    // Actually, simpler: check if habit is 'daily' OR ('one-off' AND date==dateStr)
+                    // But 'habits' list contains all.
+                    // For a specific calendar day, we should check completion of habits relevant to that day.
+
+                    // Count actionable habits for this date
+                    const actionableHabits = habits.filter(h => {
+                        if (h.type === 'one-off') return h.date === dateStr;
+                        return true; // daily
+                    });
+
+                    const actionableCount = actionableHabits.length;
+                    const completedForDate = actionableHabits.filter(h => h.completedDates && h.completedDates.includes(dateStr)).length;
+
+                    if (actionableCount > 0) {
+                        const percent = (completedForDate / actionableCount) * 100;
+
+                        if (percent === 100) {
+                            cell.classList.add('completed');
+                        } else if (percent >= 75) {
+                            // Feature: Glow Green if >= 75% (Past or Present)
+                            cell.classList.add('success-high');
+                        } else if (isPastOrToday && percent < 60) {
+                            cell.classList.add('failure');
+                        }
+                    }
+                }
+
+                cell.addEventListener('click', () => {
+                    selectedDate = date;
+                    selectedDateStr = dateStr;
+                    renderAll();
+                });
+
+                calendarGridEl.appendChild(cell);
+            }
         }
+
+        // Navigation Listeners
+        if (prevMonthBtn) {
+            prevMonthBtn.addEventListener('click', () => {
+                currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+                renderCalendar();
+            });
+        }
+
+        if (nextMonthBtn) {
+            nextMonthBtn.addEventListener('click', () => {
+                currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+                renderCalendar();
+            });
+        }
+
+    } catch (globalError) {
+        console.error("Global Script Error:", globalError);
+        alert("An error occurred starting the app: " + globalError.message);
     }
 
-    // Navigation Listeners
-    if (prevMonthBtn) {
-        prevMonthBtn.addEventListener('click', () => {
-            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
-            renderCalendar();
+    // PWA Service Worker Registration
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('Service Worker registered', reg))
+                .catch(err => console.log('Service Worker registration failed', err));
         });
     }
-
-    if (nextMonthBtn) {
-        nextMonthBtn.addEventListener('click', () => {
-            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
-            renderCalendar();
-        });
-    }
-
-} catch (globalError) {
-    console.error("Global Script Error:", globalError);
-    alert("An error occurred starting the app: " + globalError.message);
-}
-
-// PWA Service Worker Registration
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('Service Worker registered', reg))
-            .catch(err => console.log('Service Worker registration failed', err));
-    });
-}
 });
