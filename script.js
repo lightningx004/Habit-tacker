@@ -42,9 +42,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // State
+        const today = new Date();
+        const todayStr = getLocalDateString(today);
+        let selectedDate = new Date();
+        let selectedDateStr = todayStr;
+        let currentCalendarDate = new Date(); // Controls displayed month
+
         // --- DOM Elements ---
         const habitsListEl = document.getElementById('habits-list');
-        const dayPercentEl = document.getElementById('day-percent');
+        const dayPercentEl = document.getElementById('day-percent'); // This element is still needed for daily progress
 
         // Calendar Elements
         const calendarGridEl = document.getElementById('calendar-grid');
@@ -59,6 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Modal Elements
         const modal = document.getElementById('modal');
+        // Old btn removed, logic handled separately below
         const cancelBtn = document.getElementById('cancel-btn');
         const saveBtn = document.getElementById('save-btn');
         const newHabitInput = document.getElementById('new-habit-input');
