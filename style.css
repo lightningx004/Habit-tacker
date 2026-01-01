@@ -544,7 +544,16 @@ body {
 
 .habit-item.readonly {
     opacity: 0.6;
+    /* pointer-events: none;  <-- REMOVE THIS to allow clicking the handle */
+    /* Instead, disable specific children if needed, but let the LI receive events for Sortable */
+    pointer-events: auto;
+}
+
+.habit-item.readonly .habit-checkbox,
+.habit-item.readonly .delete-btn {
     pointer-events: none;
+    /* Disable editing/deleting, but allow dragging */
+    opacity: 0.5;
 }
 
 .habit-left {
@@ -643,20 +652,6 @@ body {
     text-transform: uppercase;
     letter-spacing: 1px;
     text-shadow: 0 0 10px rgba(0, 255, 156, 0.3);
-}
-
-.text-glow-red {
-    color: #ff4444 !important;
-    text-shadow: 0 0 10px #ff0000;
-    font-weight: bold;
-    font-size: 1.2em !important;
-}
-
-.text-glow-green {
-    color: #00ff9d !important;
-    text-shadow: 0 0 10px #00ff9d;
-    font-weight: bold;
-    font-size: 1.2em !important;
 }
 
 .modal-content input {
@@ -796,4 +791,37 @@ body {
     box-shadow: 0 0 5px var(--accent-neon);
     opacity: 1;
     transform: scale(1.02);
+}
+
+/* High Success Glow (>75%) */
+.calendar-day.success-high {
+    border: 1px solid var(--accent-neon) !important;
+    background: rgba(0, 255, 157, 0.25) !important;
+    box-shadow: 0 0 15px var(--accent-neon), inset 0 0 5px var(--accent-neon) !important;
+    color: #fff !important;
+    text-shadow: 0 0 5px var(--accent-neon);
+    z-index: 2;
+    /* Ensure it glows on top */
+}
+
+/* Drag Handle Tweaks for Mobile */
+.habit-item .drag-handle {
+    cursor: grab;
+    padding: 20px;
+    /* BIG touch target */
+    margin: -15px 0 -15px -15px;
+    /* Negative margin to expand touch area */
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: none !important;
+    /* Force browser to ignore scrolling */
+    -webkit-touch-callout: none;
+    user-select: none;
+}
+
+/* CRITICAL FIX: Ensure the ICON doesn't block the handle click */
+.habit-item .drag-handle svg {
+    pointer-events: none;
 }

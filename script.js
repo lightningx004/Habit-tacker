@@ -42,19 +42,26 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // State
-        const today = new Date();
-        const todayStr = getLocalDateString(today);
-        let selectedDate = new Date();
-        let selectedDateStr = todayStr;
-        let currentCalendarDate = new Date(); // Controls displayed month
+        function renderYearProgress() {
+            const now = new Date();
+            const start = new Date(now.getFullYear(), 0, 1);
+            const end = new Date(now.getFullYear() + 1, 0, 1);
+            const total = end - start;
+            const current = now - start;
+            const percent = Math.floor((current / total) * 100);
 
-        // --- DOM Elements ---
-        const habitsListEl = document.getElementById('habits-list');
-        const dayPercentEl = document.getElementById('day-percent'); // This element is still needed for daily progress
+            // Update Label with Current Year
+            const labelEl = document.getElementById('year-label');
+            if (labelEl) {
+                labelEl.textContent = `${now.getFullYear()} Progress`;
+            }
 
-        // Calendar Elements
-        const calendarGridEl = document.getElementById('calendar-grid');
+            const bar = document.getElementById('year-bar');
+            const text = document.getElementById('year-percent');
+
+            if (bar) bar.style.width = `${percent}%`;
+            if (text) text.textContent = `${percent}%`;
+        } const calendarGridEl = document.getElementById('calendar-grid');
         const calendarMonthYearEl = document.getElementById('calendar-month-year');
         const prevMonthBtn = document.getElementById('prev-month');
         const nextMonthBtn = document.getElementById('next-month');
@@ -80,8 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (habitsListEl) {
             new Sortable(habitsListEl, {
                 animation: 250,
-                delay: 300,
-                delayOnTouchOnly: true,
+                // delay: 0, // Removed delay for instant dragging via handle
                 forceFallback: true, // Use custom drag element instead of native HTML5 drag
                 fallbackOnBody: true, // Append to body to avoid overflow clipping
                 touchStartThreshold: 5, // Ignore small shakes
@@ -130,19 +136,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let isOneOff = false; // State to track modal mode
 
-        // Toggle Menu
-        if (menuBtn && habitsMenu) {
-            menuBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                habitsMenu.classList.toggle('hidden');
-            });
+        // Toggle Menu Global Function
+        window.toggleMenu = function (event) {
+            event.stopPropagation();
+            const menu = document.getElementById('habits-menu');
+            if (menu) {
+                menu.classList.toggle('hidden');
+                console.log("Menu Toggled", menu.classList.contains('hidden'));
+            } else {
+                console.error("Menu element not found!");
+            }
+        };
 
-            document.addEventListener('click', (e) => {
-                if (!menuBtn.contains(e.target) && !habitsMenu.contains(e.target)) {
-                    habitsMenu.classList.add('hidden');
+        // Close menu on outside click
+        document.addEventListener('click', (e) => {
+            const menu = document.getElementById('habits-menu');
+            const btn = document.getElementById('menu-btn');
+            if (menu && !menu.classList.contains('hidden')) {
+                // If click is outside menu and button
+                if (!menu.contains(e.target) && (!btn || !btn.contains(e.target))) {
+                    menu.classList.add('hidden');
                 }
-            });
-        }
+            }
+        });
+
+
 
         // Open "Daily Habit" Mode
         if (menuAddHabitBtn) {
@@ -458,7 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 li.innerHTML = `
                     <div class="habit-left">
-                        <div class="drag-handle" style="cursor:grab; padding: 0 10px 0 0; color:var(--text-secondary); display:flex; align-items:center;">
+                        <div class="drag-handle" style="touch-action: none;">
                              <!-- Six dots icon -->
                             <svg width="12" height="20" viewBox="0 0 12 20" fill="currentColor">
                                 <circle cx="4" cy="4" r="1.5" />
@@ -522,26 +540,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const completedOnSelected = actionableHabits.filter(h => h.completedDates && h.completedDates.includes(selectedDateStr)).length;
             const dayDayPercent = totalActionable > 0 ? Math.round((completedOnSelected / totalActionable) * 100) : 0;
 
-            // Determine Counter Label
-            let labelHTML = "COMPLETED"; // Default
+            // Counter String (e.g., "6/8")
+            const counterStr = `${completedOnSelected}/${totalActionable}`;
 
-            if (totalActionable > 0) {
-                // Feature: "6/10" with glow
-                const ratio = completedOnSelected / totalActionable;
-                const text = `${completedOnSelected}/${totalActionable}`;
-
-                if (ratio >= 0.8) {
-                    // Green Glow (>= 80%)
-                    labelHTML = `<span class="text-glow-green">${text}</span>`;
-                } else {
-                    // Red Glow (< 80%)
-                    labelHTML = `<span class="text-glow-red">${text}</span>`;
-                }
-            }
-
-            // Using formatting arguments or direct innerHTML injection in updateCircle
-            // We'll pass the raw HTML string as the 'subLabel'
-            updateCircle(dayCircleEl, dayPercentEl, dayDayPercent, labelHTML);
+            updateCircle(dayCircleEl, dayPercentEl, dayDayPercent, counterStr);
 
             // Update "TODAY" Label
             const todayLabel = document.querySelector('.today-focus h1');
@@ -562,9 +564,8 @@ document.addEventListener('DOMContentLoaded', () => {
             let totalDailyPercents = 0;
             for (let d = 1; d <= currentDay; d++) {
                 const dateStr = getLocalDateString(new Date(year, month, d));
-                // Use totalHabits for history, or maybe simpler logic. Let's stick to simple for month.
                 const completedOnDate = habits.filter(h => h.completedDates && h.completedDates.includes(dateStr)).length;
-                totalDailyPercents += (completedOnDate / (habits.length || 1)) * 100;
+                totalDailyPercents += (completedOnDate / totalHabits) * 100;
             }
             const monthPercent = Math.round(totalDailyPercents / currentDay);
             updateCircle(monthCircleEl, monthPercentEl, monthPercent);
@@ -599,15 +600,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (labelEl) {
                     if (subLabel) {
                         labelEl.innerHTML = subLabel;
+                        // Dynamic Glow classes
+                        labelEl.className = 'label'; // reset
+                        const ratio = parseInt(subLabel.split('/')[0]) / parseInt(subLabel.split('/')[1]);
+                        if (ratio >= 0.8) labelEl.classList.add('text-glow-green');
+                        else labelEl.classList.add('text-glow-red');
                     } else {
                         labelEl.textContent = "COMPLETED"; // Default fallback
-                        labelEl.className = "label"; // Reset classes
+                        labelEl.className = "label";
                     }
                 }
             }
 
-            // Update the CSS variable instead of the background string
-            // This triggers the smooth transition defined in CSS
+            // Update the CSS variable
             circleEl.style.setProperty('--progress-angle', `${percent * 3.6}deg`);
         }
 
@@ -691,6 +696,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         if (percent === 100) {
                             cell.classList.add('completed');
+                        } else if (percent >= 75) {
+                            // Feature: Glow Green if >= 75% (Past or Present)
+                            cell.classList.add('success-high');
                         } else if (isPastOrToday && percent < 60) {
                             cell.classList.add('failure');
                         }

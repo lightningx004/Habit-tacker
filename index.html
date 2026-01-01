@@ -5,8 +5,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neon Habit Tracker</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="style_mobile.css">
+    <link rel="stylesheet" href="style.css?v=1.9.16">
+    <link rel="stylesheet" href="dropdown.css">
+    <!-- ... -->
+    <!-- Main Script -->
+    <script src="script.js?v=1.9.16" defer></script>
+    <link rel="stylesheet" href="dropdown.css">
+    <!-- ... -->
+    <!-- Main Script -->
+    <script src="script.js?v=1.9.15" defer></script>
+    <link rel="stylesheet" href="dropdown.css">
+    <!-- ... -->
+    <!-- Main Script -->
+    <script src="script.js?v=1.9.14" defer></script>
+    <link rel="stylesheet" href="dropdown.css">
+    <!-- ... -->
+    <!-- Main Script -->
+    <script src="script.js?v=1.9.13" defer></script>
+    <link rel="stylesheet" href="dropdown.css">
+    <!-- ... -->
+    <!-- Main Script -->
+    <script src="script.js?v=1.9.12" defer></script>
+    <link rel="stylesheet" href="dropdown.css">
+    <!-- ... -->
+    <!-- Main Script -->
+    <script src="script.js?v=1.9.11" defer></script>
+    <link rel="stylesheet" href="dropdown.css">
+    <!-- ... -->
+    <!-- Main Script -->
+    <script src="script.js?v=1.9.10" defer></script>
+    <link rel="stylesheet" href="dropdown.css">
+    <!-- ... -->
+    <!-- Main Script -->
+    <script src="script.js?v=1.9.9" defer></script>
+    <link rel="stylesheet" href="dropdown.css">
+    <!-- ... -->
+    <!-- Main Script -->
+    <script src="script.js?v=1.9.8" defer></script>
+    <link rel="stylesheet" href="dropdown.css">
+    <!-- ... -->
+    <!-- Main Script -->
+    <script src="script.js?v=1.9.7" defer></script>
+    <link rel="stylesheet" href="dropdown.css">
+    <!-- ... -->
+    <!-- Main Script -->
+    <script src="script.js?v=1.9.6" defer></script>
+    <link rel="stylesheet" href="dropdown.css">
+    <!-- ... -->
+    <!-- Main Script -->
+    <script src="script.js?v=1.9.5" defer></script>
+    <link rel="stylesheet" href="dropdown.css">
+    <!-- ... -->
+    <!-- Main Script -->
+    <script src="script.js?v=1.9.4" defer></script>
+    <link rel="stylesheet" href="dropdown.css">
+    <!-- ... -->
+    <!-- Main Script -->
+    <script src="script.js?v=1.9.3" defer></script>
+    <link rel="stylesheet" href="dropdown.css">
+    <!-- ... -->
+    <!-- Main Script -->
+    <script src="script.js?v=1.9.2" defer></script>
+    <link rel="stylesheet" href="dropdown.css">
+    <!-- ... -->
+    <!-- Main Script -->
+    <script src="script.js?v=1.9.1" defer></script>
+    <link rel="stylesheet" href="dropdown.css">
+    <!-- ... -->
+    <!-- Main Script -->
+    <script src="script.js?v=1.9" defer></script>
     <link rel="stylesheet" href="dropdown.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,7 +82,7 @@
     <!-- PWA Setup -->
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <meta name="theme-color" content="#00ff9d">
+    <meta name="theme-color" content="#0f1110">
 </head>
 
 <body>
@@ -46,6 +113,15 @@
                 </div>
 
                 <div class="card calendar-card">
+                    <div class="year-progress-container">
+                        <div class="progress-label">
+                            <span id="year-label">Year Progress</span>
+                            <span id="year-percent">0%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="year-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
                     <div class="calendar-header">
                         <button class="icon-btn" id="prev-month">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -83,9 +159,9 @@
             <!-- Right Panel: Habits List -->
             <section class="right-panel">
                 <div class="habits-header">
-                    <h2>Your Habits <small style="font-size:0.5em; opacity:0.5;">(v1.2)</small></h2>
+                    <h2>Your Habits <small style="font-size:0.5em; opacity:0.5;">(v1.9.16)</small></h2>
                     <div class="menu-container" style="position: relative;">
-                        <button class="icon-btn" id="menu-btn" aria-label="Habit Options">
+                        <button class="icon-btn" id="menu-btn" aria-label="Habit Options" onclick="toggleMenu(event)">
                             <!-- 3 dots icon -->
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
                                 <circle cx="12" cy="5" r="2" />
@@ -139,7 +215,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 
     <!-- Main Script -->
-    <script src="script.js?v=13" defer></script>
+    <script src="script.js?v=1.8" defer></script>
 </body>
 
 </html>
