@@ -825,3 +825,22 @@ body {
 .habit-item .drag-handle svg {
     pointer-events: none;
 }
+
+/* --- Responsive Month Progress (Circle vs Bar) --- */
+@media (max-width: 768px) {
+    .desktop-month-circle {
+        display: none !important;
+    }
+    .mobile-month-bar {
+        display: block !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .mobile-month-bar {
+        display: none !important;
+    }
+    .desktop-month-circle {
+        display: flex !important; /* Restore flex for centering */
+    }
+}
