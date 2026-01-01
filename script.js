@@ -513,6 +513,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function renderProgress() {
+            // Update Year Label Dynamically (Always Run First)
+            const yearLabelEl = document.getElementById('year-label');
+            if (yearLabelEl) {
+                const currentYear = new Date().getFullYear();
+                yearLabelEl.textContent = `${currentYear} Progress`;
+            }
+
             const totalHabits = habits.length;
             if (totalHabits === 0) {
                 updateCircle(dayCircleEl, dayPercentEl, 0);
@@ -580,12 +587,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const yearPercent = Math.round(totalYearPercents / safeDiff);
             updateBar(yearFillEl, yearPercentEl, yearPercent);
-
-            // Update Year Label Dynamically
-            const yearLabelEl = document.getElementById('year-label');
-            if (yearLabelEl) {
-                yearLabelEl.textContent = `${year} Progress`;
-            }
         }
 
         function updateCircle(circleEl, textEl, percent, subLabel = "") {
