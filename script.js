@@ -580,6 +580,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const yearPercent = Math.round(totalYearPercents / safeDiff);
             updateBar(yearFillEl, yearPercentEl, yearPercent);
+
+            // Update Year Label Dynamically
+            const yearLabelEl = document.getElementById('year-label');
+            if (yearLabelEl) {
+                yearLabelEl.textContent = `${year} Progress`;
+            }
         }
 
         function updateCircle(circleEl, textEl, percent, subLabel = "") {
