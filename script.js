@@ -59,7 +59,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const prevMonthBtn = document.getElementById('prev-month');
         const nextMonthBtn = document.getElementById('next-month');
         const dayCircleEl = document.getElementById('day-circle');
-        const monthPercentEl = document.getElementById('month-percent');
+        const monthPercentBarEl = document.getElementById('month-percent-bar');
+        const monthPercentCircleEl = document.getElementById('month-percent-circle');
+        const monthFillEl = document.getElementById('month-fill');
         const monthCircleEl = document.getElementById('month-circle');
         const yearPercentEl = document.getElementById('year-percent');
         const yearFillEl = document.getElementById('year-fill');
@@ -527,7 +529,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // 2. Monthly Progress (Time Based)
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const monthPercent = Math.floor((currentDay / daysInMonth) * 100);
-            updateCircle(monthCircleEl, monthPercentEl, monthPercent);
+
+            // Update Desktop Circle
+            updateCircle(monthCircleEl, monthPercentCircleEl, monthPercent);
+            // Update Mobile Bar
+            if (monthPercentBarEl) monthPercentBarEl.textContent = `${monthPercent}%`;
+            updateBar(monthFillEl, null, monthPercent); // null because label is separate
 
             // 3. Yearly Progress (Time Based)
             const startOfYear = new Date(year, 0, 1);
