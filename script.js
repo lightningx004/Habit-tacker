@@ -513,18 +513,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         function renderProgress() {
-            // Update Year Label Dynamically (Always Run First)
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth();
+            const currentDay = today.getDate();
+
+            // 1. Update Year Label Dynamically
             const yearLabelEl = document.getElementById('year-label');
             if (yearLabelEl) {
-                const currentYear = new Date().getFullYear();
-                yearLabelEl.textContent = `${currentYear} Progress`;
+                yearLabelEl.textContent = `${year} Progress`;
             }
 
+            // 2. Monthly Progress (Time Based)
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const monthPercent = Math.floor((currentDay / daysInMonth) * 100);
+            updateCircle(monthCircleEl, monthPercentEl, monthPercent);
+
+            // 3. Yearly Progress (Time Based)
+            const startOfYear = new Date(year, 0, 1);
+            const endOfYear = new Date(year + 1, 0, 1);
+            const totalYearTime = endOfYear - startOfYear;
+            const timePassed = today - startOfYear;
+            let yearPercent = Math.floor((timePassed / totalYearTime) * 100);
+            if (yearPercent < 0) yearPercent = 0;
+            if (yearPercent > 100) yearPercent = 100;
+            updateBar(yearFillEl, yearPercentEl, yearPercent);
+
+            // 4. Daily Habit Progress (Requires Habits)
             const totalHabits = habits.length;
             if (totalHabits === 0) {
                 updateCircle(dayCircleEl, dayPercentEl, 0);
-                updateCircle(monthCircleEl, monthPercentEl, 0);
-                updateBar(yearFillEl, yearPercentEl, 0);
                 return;
             }
 
@@ -555,34 +573,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     todayLabel.textContent = selectedDate.toLocaleDateString('en-US', options).toUpperCase();
                 }
             }
-
-            // Monthly
-            const year = today.getFullYear();
-            const month = today.getMonth();
-            const currentDay = today.getDate();
-
-            // Monthly Progress (Time Based)
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const monthPercent = Math.floor((currentDay / daysInMonth) * 100);
-            updateCircle(monthCircleEl, monthPercentEl, monthPercent);
-
-            // Yearly Progress (Time Based)
-            // User expects "How much of the year has passed" or "Global Status"
-            // Switching back to Time Based because "16%" on Jan 1 is confusing if it's just daily average.
-            const startOfYear = new Date(year, 0, 1);
-            const endOfYear = new Date(year + 1, 0, 1);
-            const totalYearTime = endOfYear - startOfYear;
-            const timePassed = today - startOfYear;
-
-            // Calculate percentage of year elapsed (Date wise)
-            // Or if we specifically want "Time Progress":
-            let yearPercent = Math.floor((timePassed / totalYearTime) * 100);
-
-            // Constraint
-            if (yearPercent < 0) yearPercent = 0;
-            if (yearPercent > 100) yearPercent = 100;
-
-            updateBar(yearFillEl, yearPercentEl, yearPercent);
         }
 
         function updateCircle(circleEl, textEl, percent, subLabel = "") {
