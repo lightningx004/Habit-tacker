@@ -5,7 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neon Habit Tracker</title>
-    <link rel="stylesheet" href="style.css?v=1.9.26">
+    <link rel="stylesheet" href="style.css?v=1.9.27">
+    <link rel="stylesheet" href="dropdown.css">
+    <!-- ... -->
+    <!-- Main Script -->
+    <script src="script.js?v=1.9.27" defer></script>
     <link rel="stylesheet" href="dropdown.css">
     <!-- ... -->
     <!-- Main Script -->
@@ -113,12 +117,17 @@
                 <span class="status-dot"></span>
                 <span class="status-text">Sync</span>
             </div>
-            <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="year-fill" style="width: 0%"></div>
-            </div>
-            <div class="progress-label">
-                <span id="year-label">Year Progress</span>
-                <span id="year-percent">0%</span>
+            <!-- Year Progress Row -->
+            <div class="year-progress-row"
+                style="display: flex; align-items: center; gap: 15px; width: 100%; margin-top: 5px;">
+                <span id="year-label" style="white-space: nowrap; font-size: 0.9em; color: var(--text-secondary);">Year
+                    Progress</span>
+                <div class="progress-bar-container" style="height: 10px; background: rgba(255,255,255,0.1);">
+                    <div class="progress-fill" id="year-fill"
+                        style="width: 0%; box-shadow: 0 0 15px var(--accent-neon);"></div>
+                </div>
+                <span id="year-percent"
+                    style="min-width: 40px; text-align: right; color: var(--accent-neon); font-weight: bold;">0%</span>
             </div>
         </header>
 
@@ -172,7 +181,7 @@
             <!-- Right Panel: Habits List -->
             <section class="right-panel">
                 <div class="habits-header">
-                    <h2>Your Habits <small style="font-size:0.5em; opacity:0.5;">(v1.9.26)</small></h2>
+                    <h2>Your Habits <small style="font-size:0.5em; opacity:0.5;">(v1.9.27)</small></h2>
                     <div class="menu-container" style="position: relative;">
                         <button class="icon-btn" id="menu-btn" aria-label="Habit Options" onclick="toggleMenu(event)">
                             <!-- 3 dots icon -->
