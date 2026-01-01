@@ -570,177 +570,178 @@ document.addEventListener('DOMContentLoaded', () => {
             const monthPercent = Math.round(totalDailyPercents / currentDay);
             updateCircle(monthCircleEl, monthPercentEl, monthPercent);
 
-            // Yearly (Simulated for performance demo)
-            // Only calc for passed days in year to be accurate
+            // Yearly Progress (Time Based)
+            // User expects "How much of the year has passed" or "Global Status"
+            // Switching back to Time Based because "16%" on Jan 1 is confusing if it's just daily average.
             const startOfYear = new Date(year, 0, 1);
-            const diffStats = Math.floor((today - startOfYear) / (1000 * 60 * 60 * 24)) + 1;
+            const endOfYear = new Date(year + 1, 0, 1);
+            const totalYearTime = endOfYear - startOfYear;
+            const timePassed = today - startOfYear;
 
-            let totalYearPercents = 0;
-            // Limit loop to avoid hanging if system time is crazy, though 366 is fine.
-            const safeDiff = Math.min(diffStats, 366);
+            // Calculate percentage of year elapsed (Date wise)
+            // Or if we specifically want "Time Progress":
+            let yearPercent = Math.floor((timePassed / totalYearTime) * 100);
 
-            for (let d = 0; d < safeDiff; d++) {
-                const dDate = new Date(year, 0, 1 + d);
-                const dateStr = getLocalDateString(dDate);
-                const completedOnDate = habits.filter(h => h.completedDates && h.completedDates.includes(dateStr)).length;
-                totalYearPercents += (completedOnDate / totalHabits) * 100;
-            }
-            const yearPercent = Math.round(totalYearPercents / safeDiff);
+            // Constraint
+            if (yearPercent < 0) yearPercent = 0;
+            if (yearPercent > 100) yearPercent = 100;
+
             updateBar(yearFillEl, yearPercentEl, yearPercent);
         }
+    }
 
         function updateCircle(circleEl, textEl, percent, subLabel = "") {
-            if (!circleEl || !textEl) return;
-            textEl.textContent = `${percent}%`;
+        if (!circleEl || !textEl) return;
+        textEl.textContent = `${percent}%`;
 
-            // Handle Sub-Label (Counter)
-            const parent = textEl.parentElement;
-            if (parent) {
-                const labelEl = parent.querySelector('.label');
-                if (labelEl) {
-                    if (subLabel) {
-                        labelEl.innerHTML = subLabel;
-                        // Dynamic Glow classes
-                        labelEl.className = 'label'; // reset
-                        const ratio = parseInt(subLabel.split('/')[0]) / parseInt(subLabel.split('/')[1]);
-                        if (ratio >= 0.8) labelEl.classList.add('text-glow-green');
-                        else labelEl.classList.add('text-glow-red');
-                    } else {
-                        labelEl.textContent = "COMPLETED"; // Default fallback
-                        labelEl.className = "label";
-                    }
+        // Handle Sub-Label (Counter)
+        const parent = textEl.parentElement;
+        if (parent) {
+            const labelEl = parent.querySelector('.label');
+            if (labelEl) {
+                if (subLabel) {
+                    labelEl.innerHTML = subLabel;
+                    // Dynamic Glow classes
+                    labelEl.className = 'label'; // reset
+                    const ratio = parseInt(subLabel.split('/')[0]) / parseInt(subLabel.split('/')[1]);
+                    if (ratio >= 0.8) labelEl.classList.add('text-glow-green');
+                    else labelEl.classList.add('text-glow-red');
+                } else {
+                    labelEl.textContent = "COMPLETED"; // Default fallback
+                    labelEl.className = "label";
                 }
             }
-
-            // Update the CSS variable
-            circleEl.style.setProperty('--progress-angle', `${percent * 3.6}deg`);
         }
 
-        function updateBar(fillEl, textEl, percent) {
-            if (!fillEl || !textEl) return;
-            textEl.textContent = `${percent}%`;
-            fillEl.style.width = `${percent}%`;
+        // Update the CSS variable
+        circleEl.style.setProperty('--progress-angle', `${percent * 3.6}deg`);
+    }
+
+    function updateBar(fillEl, textEl, percent) {
+        if (!fillEl || !textEl) return;
+        textEl.textContent = `${percent}%`;
+        fillEl.style.width = `${percent}%`;
+    }
+
+    function renderCalendar() {
+        if (!calendarGridEl || !calendarMonthYearEl) return;
+
+        const year = currentCalendarDate.getFullYear();
+        const month = currentCalendarDate.getMonth();
+
+        calendarMonthYearEl.textContent = currentCalendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        calendarGridEl.innerHTML = '';
+
+        // Weekday headers
+        const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+        weekdays.forEach(day => {
+            const dayEl = document.createElement('div');
+            dayEl.style.color = '#555';
+            dayEl.style.fontSize = '0.8em';
+            dayEl.textContent = day;
+            calendarGridEl.appendChild(dayEl);
+        });
+
+        // Empty cells
+        for (let i = 0; i < firstDay; i++) {
+            calendarGridEl.appendChild(document.createElement('div'));
         }
 
-        function renderCalendar() {
-            if (!calendarGridEl || !calendarMonthYearEl) return;
+        // Days
+        for (let i = 1; i <= daysInMonth; i++) {
+            const date = new Date(year, month, i);
+            const dateStr = getLocalDateString(date);
+            const cell = document.createElement('div');
+            cell.className = 'calendar-day';
+            cell.textContent = i;
 
-            const year = currentCalendarDate.getFullYear();
-            const month = currentCalendarDate.getMonth();
-
-            calendarMonthYearEl.textContent = currentCalendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-
-            const firstDay = new Date(year, month, 1).getDay();
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-            calendarGridEl.innerHTML = '';
-
-            // Weekday headers
-            const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-            weekdays.forEach(day => {
-                const dayEl = document.createElement('div');
-                dayEl.style.color = '#555';
-                dayEl.style.fontSize = '0.8em';
-                dayEl.textContent = day;
-                calendarGridEl.appendChild(dayEl);
-            });
-
-            // Empty cells
-            for (let i = 0; i < firstDay; i++) {
-                calendarGridEl.appendChild(document.createElement('div'));
+            if (dateStr === todayStr) {
+                cell.classList.add('today');
             }
 
-            // Days
-            for (let i = 1; i <= daysInMonth; i++) {
-                const date = new Date(year, month, i);
-                const dateStr = getLocalDateString(date);
-                const cell = document.createElement('div');
-                cell.className = 'calendar-day';
-                cell.textContent = i;
+            if (dateStr === selectedDateStr) {
+                cell.classList.add('selected');
+            }
 
-                if (dateStr === todayStr) {
-                    cell.classList.add('today');
-                }
+            // Compare timestamps for passed/today check
+            const isPastOrToday = date <= new Date();
 
-                if (dateStr === selectedDateStr) {
-                    cell.classList.add('selected');
-                }
+            // Mark passed days
+            if (date < new Date(todayStr)) {
+                cell.classList.add('passed');
+            }
 
-                // Compare timestamps for passed/today check
-                const isPastOrToday = date <= new Date();
+            // Check Progress for Red Glow (< 60%)
+            if (habits.length > 0) {
+                // Filter logic must match renderHabits: 
+                // Daily always counts. One-off counts ONLY if it was for THIS date.
+                // Actually, simpler: check if habit is 'daily' OR ('one-off' AND date==dateStr)
+                // But 'habits' list contains all.
+                // For a specific calendar day, we should check completion of habits relevant to that day.
 
-                // Mark passed days
-                if (date < new Date(todayStr)) {
-                    cell.classList.add('passed');
-                }
-
-                // Check Progress for Red Glow (< 60%)
-                if (habits.length > 0) {
-                    // Filter logic must match renderHabits: 
-                    // Daily always counts. One-off counts ONLY if it was for THIS date.
-                    // Actually, simpler: check if habit is 'daily' OR ('one-off' AND date==dateStr)
-                    // But 'habits' list contains all.
-                    // For a specific calendar day, we should check completion of habits relevant to that day.
-
-                    // Count actionable habits for this date
-                    const actionableHabits = habits.filter(h => {
-                        if (h.type === 'one-off') return h.date === dateStr;
-                        return true; // daily
-                    });
-
-                    const actionableCount = actionableHabits.length;
-                    const completedForDate = actionableHabits.filter(h => h.completedDates && h.completedDates.includes(dateStr)).length;
-
-                    if (actionableCount > 0) {
-                        const percent = (completedForDate / actionableCount) * 100;
-
-                        if (percent === 100) {
-                            cell.classList.add('completed');
-                        } else if (percent >= 75) {
-                            // Feature: Glow Green if >= 75% (Past or Present)
-                            cell.classList.add('success-high');
-                        } else if (isPastOrToday && percent < 60) {
-                            cell.classList.add('failure');
-                        }
-                    }
-                }
-
-                cell.addEventListener('click', () => {
-                    selectedDate = date;
-                    selectedDateStr = dateStr;
-                    renderAll();
+                // Count actionable habits for this date
+                const actionableHabits = habits.filter(h => {
+                    if (h.type === 'one-off') return h.date === dateStr;
+                    return true; // daily
                 });
 
-                calendarGridEl.appendChild(cell);
+                const actionableCount = actionableHabits.length;
+                const completedForDate = actionableHabits.filter(h => h.completedDates && h.completedDates.includes(dateStr)).length;
+
+                if (actionableCount > 0) {
+                    const percent = (completedForDate / actionableCount) * 100;
+
+                    if (percent === 100) {
+                        cell.classList.add('completed');
+                    } else if (percent >= 75) {
+                        // Feature: Glow Green if >= 75% (Past or Present)
+                        cell.classList.add('success-high');
+                    } else if (isPastOrToday && percent < 60) {
+                        cell.classList.add('failure');
+                    }
+                }
             }
-        }
 
-        // Navigation Listeners
-        if (prevMonthBtn) {
-            prevMonthBtn.addEventListener('click', () => {
-                currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
-                renderCalendar();
+            cell.addEventListener('click', () => {
+                selectedDate = date;
+                selectedDateStr = dateStr;
+                renderAll();
             });
-        }
 
-        if (nextMonthBtn) {
-            nextMonthBtn.addEventListener('click', () => {
-                currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
-                renderCalendar();
-            });
+            calendarGridEl.appendChild(cell);
         }
-
-    } catch (globalError) {
-        console.error("Global Script Error:", globalError);
-        alert("An error occurred starting the app: " + globalError.message);
     }
 
-    // PWA Service Worker Registration
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
-                .then(reg => console.log('Service Worker registered', reg))
-                .catch(err => console.log('Service Worker registration failed', err));
+    // Navigation Listeners
+    if (prevMonthBtn) {
+        prevMonthBtn.addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+            renderCalendar();
         });
     }
+
+    if (nextMonthBtn) {
+        nextMonthBtn.addEventListener('click', () => {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+            renderCalendar();
+        });
+    }
+
+} catch (globalError) {
+    console.error("Global Script Error:", globalError);
+    alert("An error occurred starting the app: " + globalError.message);
+}
+
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('Service Worker registered', reg))
+            .catch(err => console.log('Service Worker registration failed', err));
+    });
+}
 });
