@@ -561,13 +561,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const month = today.getMonth();
             const currentDay = today.getDate();
 
-            let totalDailyPercents = 0;
-            for (let d = 1; d <= currentDay; d++) {
-                const dateStr = getLocalDateString(new Date(year, month, d));
-                const completedOnDate = habits.filter(h => h.completedDates && h.completedDates.includes(dateStr)).length;
-                totalDailyPercents += (completedOnDate / totalHabits) * 100;
-            }
-            const monthPercent = Math.round(totalDailyPercents / currentDay);
+            // Monthly Progress (Time Based)
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const monthPercent = Math.floor((currentDay / daysInMonth) * 100);
             updateCircle(monthCircleEl, monthPercentEl, monthPercent);
 
             // Yearly Progress (Time Based)
