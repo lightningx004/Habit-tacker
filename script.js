@@ -48,13 +48,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Calendar Elements
         const calendarGridEl = document.getElementById('calendar-grid');
+        const calendarMonthYearEl = document.getElementById('calendar-month-year');
+        const prevMonthBtn = document.getElementById('prev-month');
+        const nextMonthBtn = document.getElementById('next-month');
+        const dayCircleEl = document.getElementById('day-circle');
+        const monthPercentEl = document.getElementById('month-percent');
         const monthCircleEl = document.getElementById('month-circle');
         const yearPercentEl = document.getElementById('year-percent');
         const yearFillEl = document.getElementById('year-fill');
 
         // Modal Elements
         const modal = document.getElementById('modal');
-        // Old btn removed, logic handled separately below
         const cancelBtn = document.getElementById('cancel-btn');
         const saveBtn = document.getElementById('save-btn');
         const newHabitInput = document.getElementById('new-habit-input');
