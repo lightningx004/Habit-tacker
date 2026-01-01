@@ -527,12 +527,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 2. Monthly Progress (Time Based)
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const monthPercent = Math.floor((currentDay / daysInMonth) * 100);
-
-            // Update Desktop Circle
-            updateCircle(monthCircleEl, monthPercentCircleEl, monthPercent);
-            // Update Mobile Bar
-            if (monthPercentBarEl) monthPercentBarEl.textContent = `${monthPercent}%`;
-            updateBar(monthFillEl, null, monthPercent); // null because label is separate
+            updateCircle(monthCircleEl, monthPercentEl, monthPercent);
 
             // 3. Yearly Progress (Time Based)
             const startOfYear = new Date(year, 0, 1);
