@@ -513,7 +513,7 @@ body {
     /* Safari/Chrome */
     -webkit-touch-callout: none;
     /* Disable context menu */
-    touch-action: pan-y;
+    /* touch-action: pan-y; <--- REMOVED to allow SortableJS to handle touch */
     /* Allow vertical scroll only */
 }
 

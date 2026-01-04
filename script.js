@@ -80,11 +80,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (habitsListEl) {
             new Sortable(habitsListEl, {
                 animation: 250,
-                delay: 150, // Delay for 150ms before drag starts on touch devices (prevents scroll blocking)
-                delayOnTouchOnly: true, // Only apply delay on touch
-                forceFallback: false, // Try native drag first for better performance, but fallback if needed
+                delay: 100, // Reduced delay for snappier response (press and hold briefly)
+                delayOnTouchOnly: true,
+                forceFallback: false,
                 fallbackOnBody: true,
-                touchStartThreshold: 5,
+                touchStartThreshold: 3, // More sensitive
                 swapThreshold: 0.65,
                 ghostClass: 'sortable-ghost',
                 dragClass: 'sortable-drag',
