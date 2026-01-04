@@ -80,14 +80,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (habitsListEl) {
             new Sortable(habitsListEl, {
                 animation: 250,
-                // delay: 0, // Removed delay for instant dragging via handle
-                forceFallback: true, // Use custom drag element instead of native HTML5 drag
-                fallbackOnBody: true, // Append to body to avoid overflow clipping
-                touchStartThreshold: 5, // Ignore small shakes
-                swapThreshold: 0.65, // Require 65% overlap to swap
+                delay: 150, // Delay for 150ms before drag starts on touch devices (prevents scroll blocking)
+                delayOnTouchOnly: true, // Only apply delay on touch
+                forceFallback: false, // Try native drag first for better performance, but fallback if needed
+                fallbackOnBody: true,
+                touchStartThreshold: 5,
+                swapThreshold: 0.65,
                 ghostClass: 'sortable-ghost',
                 dragClass: 'sortable-drag',
-                handle: '.drag-handle', // Restrict drag to handle
+                filter: '.habit-checkbox, .delete-btn, .streak-container', // Do not drag when clicking these
+                preventOnFilter: false, // Call event on filtered items (allow click)
+                // handle: '.drag-handle', // REMOVED: Allow dragging entire row
                 onEnd: function (evt) {
                     // Update Order in Logic
                     const newIndex = evt.newIndex;
@@ -487,15 +490,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 li.innerHTML = `
                     <div class="habit-left">
-                         <div class="habit-controls" style="display: flex; flex-direction: column; align-items: center; margin-right: 5px;">
-                            <button class="move-btn up-btn" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; padding:0; line-height:0.8; opacity:0.5;" title="Move Up" data-id="${habit.id}">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
-                            </button>
-                            <button class="move-btn down-btn" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; padding:0; line-height:0.8; opacity:0.5;" title="Move Down" data-id="${habit.id}">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                            </button>
-                        </div>
-                        <div class="drag-handle" style="touch-action: none; cursor: grab; opacity: 0.7;">
+                        <div class="drag-handle" style="touch-action: none; cursor: grab; opacity: 0.5; margin-right: 10px;">
                              <!-- Six dots icon -->
                             <svg width="12" height="20" viewBox="0 0 12 20" fill="currentColor">
                                 <circle cx="4" cy="4" r="1.5" />
@@ -517,23 +512,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="delete-btn" title="Delete Habit">×</button>
                     </div>
                 `;
-
-                // Add Event Listeners for Up/Down
-                const upBtn = li.querySelector('.up-btn');
-                const downBtn = li.querySelector('.down-btn');
-
-                if (upBtn) {
-                    upBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        moveHabit(habit.id, 'up');
-                    });
-                }
-                if (downBtn) {
-                    downBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        moveHabit(habit.id, 'down');
-                    });
-                }
 
                 const checkbox = li.querySelector('.habit-checkbox');
                 if (checkbox) {
