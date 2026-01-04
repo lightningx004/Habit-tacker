@@ -90,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 handle: '.drag-handle', // Restrict drag to handle
                 onEnd: function (evt) {
                     // Update Order in Logic
-                    const itemEl = evt.item;
                     const newIndex = evt.newIndex;
                     const oldIndex = evt.oldIndex;
 
@@ -98,24 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const movedItem = habits.splice(oldIndex, 1)[0];
                     habits.splice(newIndex, 0, movedItem);
 
-                    // Update 'order' property for ALL habits to match new index
-                    // This ensures consistency
-                    habits.forEach((h, index) => {
-                        h.order = index;
-                    });
-
-                    // Save to Cloud (Batch Update)
-                    if (db) {
-                        const batch = db.batch();
-                        habits.forEach(h => {
-                            // Ensure ID is string
-                            const ref = db.collection('habits').doc(h.id.toString());
-                            batch.update(ref, { order: h.order });
-                        });
-                        batch.commit().catch(e => console.error("Reorder failed:", e));
-                    } else {
-                        saveHabitsLocal();
-                    }
+                    saveReorderedHabits();
                 }
             });
         }
@@ -324,6 +306,42 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        function saveReorderedHabits() {
+            // Update 'order' property for ALL habits
+            habits.forEach((h, index) => {
+                h.order = index;
+            });
+
+            if (db) {
+                const batch = db.batch();
+                habits.forEach(h => {
+                    const ref = db.collection('habits').doc(h.id.toString());
+                    batch.update(ref, { order: h.order });
+                });
+                batch.commit().catch(e => console.error("Reorder failed:", e));
+            } else {
+                saveHabitsLocal();
+            }
+        }
+
+        function moveHabit(id, direction) {
+            const index = habits.findIndex(h => h.id.toString() === id.toString());
+            if (index === -1) return;
+
+            if (direction === 'up') {
+                if (index === 0) return; // Already at top
+                // Swap
+                [habits[index - 1], habits[index]] = [habits[index], habits[index - 1]];
+            } else if (direction === 'down') {
+                if (index === habits.length - 1) return; // Already at bottom
+                // Swap
+                [habits[index], habits[index + 1]] = [habits[index + 1], habits[index]];
+            }
+
+            saveReorderedHabits();
+            renderAll();
+        }
+
         function deleteHabitAction(id) {
             if (db) {
                 db.collection('habits').doc(id.toString()).delete();
@@ -469,7 +487,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 li.innerHTML = `
                     <div class="habit-left">
-                        <div class="drag-handle" style="touch-action: none;">
+                         <div class="habit-controls" style="display: flex; flex-direction: column; align-items: center; margin-right: 5px;">
+                            <button class="move-btn up-btn" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; padding:0; line-height:0.8; opacity:0.5;" title="Move Up" data-id="${habit.id}">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                            </button>
+                            <button class="move-btn down-btn" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; padding:0; line-height:0.8; opacity:0.5;" title="Move Down" data-id="${habit.id}">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </button>
+                        </div>
+                        <div class="drag-handle" style="touch-action: none; cursor: grab; opacity: 0.7;">
                              <!-- Six dots icon -->
                             <svg width="12" height="20" viewBox="0 0 12 20" fill="currentColor">
                                 <circle cx="4" cy="4" r="1.5" />
@@ -491,6 +517,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         <button class="delete-btn" title="Delete Habit">×</button>
                     </div>
                 `;
+
+                // Add Event Listeners for Up/Down
+                const upBtn = li.querySelector('.up-btn');
+                const downBtn = li.querySelector('.down-btn');
+
+                if (upBtn) {
+                    upBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        moveHabit(habit.id, 'up');
+                    });
+                }
+                if (downBtn) {
+                    downBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        moveHabit(habit.id, 'down');
+                    });
+                }
 
                 const checkbox = li.querySelector('.habit-checkbox');
                 if (checkbox) {
