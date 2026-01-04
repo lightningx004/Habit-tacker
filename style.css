@@ -780,21 +780,32 @@ body {
 
 /* Drag & Drop Styles */
 .sortable-ghost {
-    opacity: 0.4;
-    background: rgba(0, 255, 157, 0.1);
-    border: 1px dashed var(--accent-neon);
+    opacity: 0.6;
+    /* Slight visibility to see where it will land */
+    background: transparent;
+    border: 2px dashed #444;
+    /* Dashed gap style */
+    box-shadow: none;
+    color: transparent;
+    /* Hide text in the gap */
+    pointer-events: none;
+}
+
+.sortable-ghost>* {
+    opacity: 0;
+    /* Hide inner content of the gap */
+    visibility: hidden;
 }
 
 .sortable-drag {
     cursor: grabbing;
-    background: #25282c;
-    /* Slightly lighter bg to stand out */
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 10px var(--accent-neon);
+    background: #2b2b2b;
+    /* distinct bg */
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6), 0 0 15px var(--accent-neon);
+    /* Strong lift */
     opacity: 1;
     transform: scale(1.05);
-    /* Slightly larger scale */
-    z-index: 1000;
-    /* Ensure it's on top */
+    z-index: 9999;
 }
 
 /* High Success Glow (>75%) */

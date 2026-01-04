@@ -80,25 +80,34 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- Drag & Drop Initialization ---
         if (habitsListEl) {
             new Sortable(habitsListEl, {
-                animation: 250,
-                delay: 250, // 250ms delay for "long press" behavior
-                delayOnTouchOnly: false, // Apply delay on BOTH Mouse and Touch to enable "long click" behavior
-                forceFallback: true, // Use JS fallback for consistent visuals
-                fallbackOnBody: true,
+                animation: 200, // Smoothly slide other items out of the way (creates the "gap" opening effect)
+                delay: 200, // Long press delay
+                delayOnTouchOnly: false,
+                forceFallback: true, // Required for the "floating" item effect
+                fallbackOnBody: true, // Appends to body to avoid overflow issues
                 touchStartThreshold: 5,
                 swapThreshold: 0.65,
                 ghostClass: 'sortable-ghost',
                 dragClass: 'sortable-drag',
-                filter: '.habit-checkbox, .delete-btn, .streak-container', // Do not drag when clicking these
-                preventOnFilter: false, // Call event on filtered items (allow click)
-                // handle: '.drag-handle', // REMOVED: Allow dragging entire row
+                scroll: true,
+                scrollSensitivity: 80, // Easier auto-scroll near edges
+                scrollSpeed: 10,
+                filter: '.habit-checkbox, .delete-btn, .streak-container',
+                preventOnFilter: false,
+                onStart: function (evt) {
+                    // Tactile feedback
+                    if (navigator.vibrate) navigator.vibrate(50);
+                },
                 onEnd: function (evt) {
-                    // Update Order in Logic
                     const newIndex = evt.newIndex;
                     const oldIndex = evt.oldIndex;
 
-                    // Reorder local array
+                    if (newIndex === oldIndex) return;
+
+                    // STRICT REMOVE -> INSERT LOGIC (No Swapping)
+                    // 1. Remove item from old index
                     const movedItem = habits.splice(oldIndex, 1)[0];
+                    // 2. Insert item at new index
                     habits.splice(newIndex, 0, movedItem);
 
                     saveReorderedHabits();
