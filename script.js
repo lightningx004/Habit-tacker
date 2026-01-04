@@ -337,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        function moveHabit(id, direction) {
+        window.moveHabit = function (id, direction) {
             const index = habits.findIndex(h => h.id.toString() === id.toString());
             if (index === -1) return;
 
@@ -352,8 +352,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             saveReorderedHabits();
-            renderAll();
-        }
+
+            // Smooth Transition
+            if (document.startViewTransition) {
+                document.startViewTransition(() => renderAll());
+            } else {
+                renderAll();
+            }
+        };
 
         function deleteHabitAction(id) {
             if (db) {
@@ -501,6 +507,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 li.innerHTML = `
                     <div class="habit-left">
+                         <!-- Manual Reorder Controls -->
+                        <div class="reorder-controls">
+                            <!-- UP -->
+                            <button class="reorder-btn up-btn" onclick="moveHabit('${habit.id}', 'up')" title="Move Up" ${index === 0 ? 'disabled' : ''}>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                            </button>
+                            <!-- DOWN -->
+                            <button class="reorder-btn down-btn" onclick="moveHabit('${habit.id}', 'down')" title="Move Down" ${index === habits.length - 1 ? 'disabled' : ''}>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </button>
+                        </div>
+
                         <div class="habit-checkbox ${isCompleted ? 'checked' : ''} ${!isToday ? 'disabled' : ''}" data-id="${habit.id}"></div>
                         <span class="habit-name">${habit.name} ${oneOffTag}</span>
                     </div>
