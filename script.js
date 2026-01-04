@@ -77,33 +77,34 @@ document.addEventListener('DOMContentLoaded', () => {
         renderAll();
 
         // --- Drag & Drop Initialization ---
-        // if (habitsListEl) {
-        //     new Sortable(habitsListEl, {
-        //         animation: 250,
-        //         delay: 250, // 250ms delay for "long press" behavior
-        //         delayOnTouchOnly: true,
-        //         forceFallback: true, // Use JS fallback for reliability
-        //         fallbackOnBody: true,
-        //         touchStartThreshold: 3,
-        //         swapThreshold: 0.65,
-        //         ghostClass: 'sortable-ghost',
-        //         dragClass: 'sortable-drag',
-        //         filter: '.habit-checkbox, .delete-btn, .streak-container', // Do not drag when clicking these
-        //         preventOnFilter: false, // Call event on filtered items (allow click)
-        //         // handle: '.drag-handle', // REMOVED: Allow dragging entire row
-        //         onEnd: function (evt) {
-        //             // Update Order in Logic
-        //             const newIndex = evt.newIndex;
-        //             const oldIndex = evt.oldIndex;
-        //
-        //             // Reorder local array
-        //             const movedItem = habits.splice(oldIndex, 1)[0];
-        //             habits.splice(newIndex, 0, movedItem);
-        //
-        //             saveReorderedHabits();
-        //         }
-        //     });
-        // }
+        // --- Drag & Drop Initialization ---
+        if (habitsListEl) {
+            new Sortable(habitsListEl, {
+                animation: 250,
+                delay: 250, // 250ms delay for "long press" behavior
+                delayOnTouchOnly: false, // Apply delay on BOTH Mouse and Touch to enable "long click" behavior
+                forceFallback: true, // Use JS fallback for consistent visuals
+                fallbackOnBody: true,
+                touchStartThreshold: 5,
+                swapThreshold: 0.65,
+                ghostClass: 'sortable-ghost',
+                dragClass: 'sortable-drag',
+                filter: '.habit-checkbox, .delete-btn, .streak-container', // Do not drag when clicking these
+                preventOnFilter: false, // Call event on filtered items (allow click)
+                // handle: '.drag-handle', // REMOVED: Allow dragging entire row
+                onEnd: function (evt) {
+                    // Update Order in Logic
+                    const newIndex = evt.newIndex;
+                    const oldIndex = evt.oldIndex;
+
+                    // Reorder local array
+                    const movedItem = habits.splice(oldIndex, 1)[0];
+                    habits.splice(newIndex, 0, movedItem);
+
+                    saveReorderedHabits();
+                }
+            });
+        }
 
         // --- Event Listeners ---
         // Menu Elements

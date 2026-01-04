@@ -787,10 +787,14 @@ body {
 
 .sortable-drag {
     cursor: grabbing;
-    background: #1a1a1a;
-    box-shadow: 0 0 5px var(--accent-neon);
+    background: #25282c;
+    /* Slightly lighter bg to stand out */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 10px var(--accent-neon);
     opacity: 1;
-    transform: scale(1.02);
+    transform: scale(1.05);
+    /* Slightly larger scale */
+    z-index: 1000;
+    /* Ensure it's on top */
 }
 
 /* High Success Glow (>75%) */
