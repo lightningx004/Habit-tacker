@@ -80,11 +80,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (habitsListEl) {
             new Sortable(habitsListEl, {
                 animation: 250,
-                delay: 100, // Reduced delay for snappier response (press and hold briefly)
+                delay: 50, // Short delay for touch
                 delayOnTouchOnly: true,
-                forceFallback: false,
+                forceFallback: true, // Use JS fallback for reliability
                 fallbackOnBody: true,
-                touchStartThreshold: 3, // More sensitive
+                touchStartThreshold: 3,
                 swapThreshold: 0.65,
                 ghostClass: 'sortable-ghost',
                 dragClass: 'sortable-drag',
@@ -483,7 +483,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const streak = calculateStreak(habit.completedDates);
 
                 const li = document.createElement('li');
-                li.className = `habit-item ${isCompleted ? 'completed' : ''} ${!isToday ? 'readonly' : ''}`;
+                li.className = `habit-item ${isCompleted ? 'checked' : ''} ${!isToday ? 'readonly' : ''}`;
+                li.setAttribute('data-id', habit.id); // Helpful for Sortable identification
 
                 // Add visual tag for one-off?
                 const oneOffTag = habit.type === 'one-off' ? '<span class="tag-oneoff" style="font-size:0.7em; color:var(--accent-neon); margin-left:10px; border:1px solid var(--accent-neon); padding:2px 6px; border-radius:4px;">TASK</span>' : '';
