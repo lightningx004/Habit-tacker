@@ -490,17 +490,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 li.innerHTML = `
                     <div class="habit-left">
-                        <div class="drag-handle" style="touch-action: none; cursor: grab; opacity: 0.5; margin-right: 10px;">
-                             <!-- Six dots icon -->
-                            <svg width="12" height="20" viewBox="0 0 12 20" fill="currentColor">
-                                <circle cx="4" cy="4" r="1.5" />
-                                <circle cx="4" cy="10" r="1.5" />
-                                <circle cx="4" cy="16" r="1.5" />
-                                <circle cx="8" cy="4" r="1.5" />
-                                <circle cx="8" cy="10" r="1.5" />
-                                <circle cx="8" cy="16" r="1.5" />
-                            </svg>
-                        </div>
                         <div class="habit-checkbox ${isCompleted ? 'checked' : ''} ${!isToday ? 'disabled' : ''}" data-id="${habit.id}"></div>
                         <span class="habit-name">${habit.name} ${oneOffTag}</span>
                     </div>
