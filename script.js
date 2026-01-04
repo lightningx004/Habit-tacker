@@ -449,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const isToday = selectedDateStr === todayStr;
 
-            habits.forEach(habit => {
+            habits.forEach((habit, index) => {
                 // Filter: Show if Daily OR if One-Off matches selected date
                 const isDaily = !habit.type || habit.type === 'daily';
                 const isOneOffMatch = habit.type === 'one-off' && habit.date === selectedDateStr;
