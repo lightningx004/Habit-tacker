@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (habitsListEl) {
             new Sortable(habitsListEl, {
                 animation: 250,
-                delay: 50, // Short delay for touch
+                delay: 250, // 250ms delay for "long press" behavior
                 delayOnTouchOnly: true,
                 forceFallback: true, // Use JS fallback for reliability
                 fallbackOnBody: true,
