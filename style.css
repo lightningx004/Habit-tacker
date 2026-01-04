@@ -806,6 +806,8 @@ body {
     opacity: 1;
     transform: scale(1.05);
     z-index: 9999;
+    pointer-events: none;
+    /* CRITICAL: Allows events to pass through to the list below so Sortable detects the matching slot */
 }
 
 /* High Success Glow (>75%) */
